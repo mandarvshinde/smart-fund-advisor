@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -45,9 +44,11 @@ export interface Goal {
   targetAmount: number;
   currentAmount: number;
   targetDate: string;
-  investments: string[]; // Investment IDs
-  progress: number; // Percentage completion
+  investments: string[];
+  progress: number;
   riskAppetite: 'low' | 'moderate' | 'high';
+  monthlyContribution?: number;
+  expectedReturn?: number;
 }
 
 export interface Recommendation {
