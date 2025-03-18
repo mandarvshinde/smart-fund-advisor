@@ -1,4 +1,3 @@
-
 import { User, MutualFund, Investment, Goal, Recommendation, MarketInsight } from '@/types';
 
 // Mock user
@@ -330,4 +329,19 @@ export const actOnRecommendation = (recommendationId: string): Promise<boolean> 
       resolve(true);
     }, 800);
   });
+};
+
+// Fetch a single goal by ID
+export const fetchGoalById = async (id: string) => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const goals = await fetchGoals();
+  const goal = goals.find(goal => goal.id === id);
+  
+  if (!goal) {
+    throw new Error(`Goal with ID ${id} not found`);
+  }
+  
+  return goal;
 };
