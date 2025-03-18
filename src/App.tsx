@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/context/UserContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Investments from "./pages/Investments";
+import Invest from "./pages/Invest";
 import Advisor from "./pages/Advisor";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -30,6 +32,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/investments" element={<Investments />} />
+            <Route path="/invest" element={<Invest />} />
             <Route path="/advisor" element={<Advisor />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
