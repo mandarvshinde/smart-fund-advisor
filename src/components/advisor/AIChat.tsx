@@ -96,10 +96,10 @@ const AIChat = () => {
   ];
 
   return (
-    <div className="flex flex-col h-[calc(100vh-16rem)]">
+    <div className="flex flex-col h-[calc(100vh-12rem)]">
       <Card className="flex-grow flex flex-col overflow-hidden">
         <ScrollArea className="flex-grow p-4">
-          <div className="space-y-4">
+          <div className="space-y-6">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -108,11 +108,11 @@ const AIChat = () => {
                 }`}
               >
                 <div
-                  className={`flex items-start max-w-[80%] ${
+                  className={`flex items-start max-w-[85%] ${
                     message.sender === "user" ? "flex-row-reverse" : ""
                   }`}
                 >
-                  <Avatar className={`${message.sender === "user" ? "ml-2" : "mr-2"} mt-0.5`}>
+                  <Avatar className={`${message.sender === "user" ? "ml-3" : "mr-3"} mt-0.5`}>
                     {message.sender === "ai" ? (
                       <>
                         <AvatarImage src="/placeholder.svg" />
@@ -131,7 +131,7 @@ const AIChat = () => {
                   </Avatar>
                   <div>
                     <div
-                      className={`rounded-lg p-3 ${
+                      className={`rounded-lg p-4 ${
                         message.sender === "ai"
                           ? "bg-muted text-foreground"
                           : "bg-finance-primary text-white"
@@ -155,13 +155,13 @@ const AIChat = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="flex items-start max-w-[80%]">
-                  <Avatar className="mr-2 mt-0.5">
+                <div className="flex items-start max-w-[85%]">
+                  <Avatar className="mr-3 mt-0.5">
                     <AvatarFallback className="bg-finance-primary text-white">
                       <Bot className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-muted text-foreground rounded-lg p-3">
+                  <div className="bg-muted text-foreground rounded-lg p-4">
                     <div className="flex space-x-2">
                       <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse"></div>
                       <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
