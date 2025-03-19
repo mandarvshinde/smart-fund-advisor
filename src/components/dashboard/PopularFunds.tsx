@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers } from "lucide-react";
+import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers, LayoutList, ArrowUpDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { MutualFund } from "@/types";
@@ -16,6 +16,22 @@ import {
   CarouselNext,
   CarouselPrevious
 } from "@/components/ui/carousel";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Fund category definitions with icons and filtering logic
 const fundCategories = [
@@ -93,18 +109,75 @@ export const PopularFunds = () => {
   });
 
   const [activeCategory, setActiveCategory] = useState("high-return");
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof MutualFund | null;
+    direction: "asc" | "desc";
+  }>({
+    key: "oneYearReturn",
+    direction: "desc",
+  });
+
+  const ITEMS_PER_PAGE = 5;
 
   // Get filtered funds based on active category
   const getFilteredFunds = () => {
     const category = fundCategories.find(cat => cat.id === activeCategory);
     if (!category) return [];
     
-    // For simplicity in the mock data, we'll just limit each category to a few funds
-    // In real app, we would use the filter function from the category
-    return funds.filter(category.filter).slice(0, 8);
+    return funds.filter(category.filter);
   };
 
   const filteredFunds = getFilteredFunds();
+
+  // Sort funds based on sort configuration
+  const sortedFunds = React.useMemo(() => {
+    const sorted = [...filteredFunds];
+    if (sortConfig.key) {
+      sorted.sort((a, b) => {
+        if (a[sortConfig.key!] < b[sortConfig.key!]) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (a[sortConfig.key!] > b[sortConfig.key!]) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sorted;
+  }, [filteredFunds, sortConfig]);
+
+  // Get paginated funds for list view
+  const paginatedFunds = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedFunds.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [sortedFunds, currentPage]);
+
+  // Get carousel funds for card view
+  const carouselFunds = React.useMemo(() => {
+    return sortedFunds.slice(0, 8);
+  }, [sortedFunds]);
+
+  const totalPages = Math.ceil(sortedFunds.length / ITEMS_PER_PAGE);
+
+  const handleSort = (key: keyof MutualFund) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
+    }));
+  };
+
+  const getSortIcon = (key: keyof MutualFund) => {
+    if (sortConfig.key !== key) {
+      return <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />;
+    }
+    return sortConfig.direction === "asc" ? (
+      <ArrowUpDown className="h-3 w-3 ml-1 text-finance-primary" />
+    ) : (
+      <ArrowUpDown className="h-3 w-3 ml-1 text-finance-primary rotate-180" />
+    );
+  };
 
   if (isLoading) {
     return (
@@ -130,11 +203,31 @@ export const PopularFunds = () => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Popular Funds</h2>
-        <Button variant="link" size="sm" asChild>
-          <Link to="/invest" className="text-finance-primary">
-            View All <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center border rounded overflow-hidden">
+            <Button
+              variant={viewMode === "cards" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("cards")}
+              className="rounded-none"
+            >
+              <Carousel className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="rounded-none"
+            >
+              <LayoutList className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button variant="link" size="sm" asChild>
+            <Link to="/invest" className="text-finance-primary">
+              View All <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="high-return" onValueChange={setActiveCategory} className="w-full">
@@ -159,7 +252,7 @@ export const PopularFunds = () => {
               <div className="text-center py-8">
                 <p className="text-gray-500">No funds available in this category</p>
               </div>
-            ) : (
+            ) : viewMode === "cards" ? (
               <div className="relative">
                 <Carousel
                   opts={{
@@ -169,7 +262,7 @@ export const PopularFunds = () => {
                   className="w-full"
                 >
                   <CarouselContent>
-                    {filteredFunds.map(fund => (
+                    {carouselFunds.map(fund => (
                       <CarouselItem key={fund.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4">
                         <FundCard fund={fund} />
                       </CarouselItem>
@@ -180,6 +273,120 @@ export const PopularFunds = () => {
                     <CarouselNext className="-right-6" />
                   </div>
                 </Carousel>
+              </div>
+            ) : (
+              <div className="relative">
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[220px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="font-medium p-0 h-auto" 
+                            onClick={() => handleSort("name")}
+                          >
+                            Fund Name {getSortIcon("name")}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="font-medium p-0 h-auto" 
+                            onClick={() => handleSort("oneYearReturn")}
+                          >
+                            1Y Return {getSortIcon("oneYearReturn")}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="font-medium p-0 h-auto" 
+                            onClick={() => handleSort("threeYearReturn")}
+                          >
+                            3Y Return {getSortIcon("threeYearReturn")}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="font-medium p-0 h-auto" 
+                            onClick={() => handleSort("fiveYearReturn")}
+                          >
+                            5Y Return {getSortIcon("fiveYearReturn")}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[100px]">
+                          <span className="font-medium">NAV</span>
+                        </TableHead>
+                        <TableHead className="w-[90px] text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedFunds.map(fund => (
+                        <TableRow key={fund.id}>
+                          <TableCell className="font-medium">
+                            <div>
+                              <div className="truncate max-w-[220px]">{fund.name}</div>
+                              <div className="text-xs text-gray-500">{fund.fundHouse}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className={`${fund.oneYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.oneYearReturn.toFixed(2)}%
+                          </TableCell>
+                          <TableCell className={`${fund.threeYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.threeYearReturn.toFixed(2)}%
+                          </TableCell>
+                          <TableCell className={`${fund.fiveYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.fiveYearReturn.toFixed(2)}%
+                          </TableCell>
+                          <TableCell>₹{fund.nav.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/invest?fund=${fund.id}`}>
+                                Invest
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {totalPages > 1 && (
+                    <div className="py-4 border-t">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious 
+                              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                          {Array.from({ length: totalPages }).map((_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                isActive={currentPage === i + 1}
+                                onClick={() => setCurrentPage(i + 1)}
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext 
+                              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </Card>
               </div>
             )}
           </TabsContent>
