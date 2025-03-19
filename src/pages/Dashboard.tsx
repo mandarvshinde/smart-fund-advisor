@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import { PortfolioSummary } from "@/components/dashboard/PortfolioSummary";
 import { Recommendations } from "@/components/dashboard/Recommendations";
+import { PopularFunds } from "@/components/dashboard/PopularFunds";
 import { GoalTracker } from "@/components/dashboard/GoalTracker";
 import { MarketInsights } from "@/components/dashboard/MarketInsights";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-6">
           <PortfolioSummary />
           <Recommendations />
+          <PopularFunds />
         </div>
         
         <div className="space-y-6">
