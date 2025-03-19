@@ -24,6 +24,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartConfig,
 } from "@/components/ui/chart";
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Legend } from "recharts";
 
@@ -163,6 +164,32 @@ const AIChat = () => {
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+  const portfolioChartConfig: ChartConfig = {
+    Equity: { 
+      color: '#0088FE',
+      label: 'Equity'
+    },
+    Debt: { 
+      color: '#00C49F',
+      label: 'Debt'
+    },
+    Gold: { 
+      color: '#FFBB28',
+      label: 'Gold'
+    },
+    Cash: { 
+      color: '#FF8042',
+      label: 'Cash'
+    },
+  };
+
+  const performanceChartConfig: ChartConfig = {
+    value: {
+      color: '#3E63DD',
+      label: 'Portfolio Value'
+    }
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]">
       <Card className="flex-grow flex flex-col overflow-hidden">
@@ -252,7 +279,7 @@ const AIChat = () => {
                   {showVisualization === "portfolio" ? (
                     <div className="h-[300px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <ChartContainer>
+                        <ChartContainer config={portfolioChartConfig}>
                           <RechartsPieChart>
                             <Pie
                               data={portfolioData}
@@ -277,7 +304,7 @@ const AIChat = () => {
                   ) : (
                     <div className="h-[300px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <ChartContainer>
+                        <ChartContainer config={performanceChartConfig}>
                           <RechartsBarChart
                             data={performanceData}
                             margin={{
