@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
@@ -30,24 +29,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
-  const handleSignOut = () => {
-    // Clear any user data or tokens from localStorage if they exist
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    
-    toast({
-      title: "Signed out",
-      description: "You have been signed out of your account.",
-    });
-    
-    // Redirect to login page
+  const handleSignOut = async () => {
+    await logout();
     navigate('/login');
   };
 

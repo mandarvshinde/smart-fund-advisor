@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { User } from '@/types';
-import { fetchUser, updateUserSettings } from '@/services/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
 interface UserContextProps {
@@ -9,26 +10,45 @@ interface UserContextProps {
   isLoading: boolean;
   updateUser: (updatedUser: User) => Promise<void>;
   toggleAgenticAI: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadUser = async () => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    const initializeAuth = async () => {
       try {
-        const userData = await fetchUser();
-        setUser(userData);
+        setIsLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user);
+        }
       } catch (error) {
-        console.error('Failed to load user data:', error);
+        console.error('Error initializing auth:', error);
         toast({
-          title: 'Error',
-          description: 'Failed to load user data. Please try again.',
+          title: 'Authentication Error',
+          description: 'Failed to initialize authentication. Please try again.',
           variant: 'destructive',
         });
       } finally {
@@ -36,14 +56,64 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     };
 
-    loadUser();
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [toast]);
+
+  const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setUser({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          profileImage: data.profile_image,
+          riskAppetite: data.risk_appetite as 'low' | 'moderate' | 'high',
+          agenticAIEnabled: data.agentic_ai_enabled,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load user profile. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const updateUser = async (updatedUser: User) => {
     setIsLoading(true);
     try {
-      const result = await updateUserSettings(updatedUser);
-      setUser(result);
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: updatedUser.name,
+          profile_image: updatedUser.profileImage,
+          risk_appetite: updatedUser.riskAppetite,
+          agentic_ai_enabled: updatedUser.agenticAIEnabled,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', updatedUser.id);
+
+      if (error) throw error;
+
+      setUser(updatedUser);
       toast({
         title: 'Success',
         description: 'Your settings have been updated.',
@@ -82,8 +152,29 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setSession(null);
+      
+      toast({
+        title: 'Signed out',
+        description: 'You have been signed out of your account.',
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to sign out. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

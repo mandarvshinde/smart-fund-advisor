@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -36,8 +37,10 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const Register = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user, isLoading } = useUser();
+  const navigate = useNavigate();
   
   // If already logged in, redirect to dashboard
   if (user && !isLoading) {
@@ -57,24 +60,37 @@ const Register = () => {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      // In a real app, you would call your auth service here
-      // For this demo, we'll simulate a successful registration with a delay
-      console.log("Registration data:", data);
+      setIsSubmitting(true);
+      
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+            risk_appetite: data.riskAppetite,
+          },
+        },
+      });
+      
+      if (error) throw error;
       
       toast({
         title: "Registration Successful",
-        description: "Welcome to SmartFund! You can now log in.",
+        description: "Welcome to SmartFund! Please check your email to verify your account.",
       });
       
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } catch (error) {
+      // Navigate to login page after successful registration
+      navigate('/login');
+    } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
-        description: "There was an error creating your account. Please try again.",
+        description: error.message || "There was an error creating your account. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -212,9 +228,9 @@ const Register = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting || isLoading}>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Create Account
+                {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
           </Form>

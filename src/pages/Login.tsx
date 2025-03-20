@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -30,8 +31,10 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user, isLoading } = useUser();
+  const navigate = useNavigate();
   
   // If already logged in, redirect to dashboard
   if (user && !isLoading) {
@@ -49,23 +52,30 @@ const Login = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      // In a real app, you would call your auth service here
-      // For this demo, we'll simulate a successful login with a delay
+      setIsSubmitting(true);
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (error) throw error;
+      
       toast({
         title: "Login Successful",
         description: "Welcome back to SmartFund!",
       });
       
-      // Redirect would happen in the useUser hook when user is set
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1500);
-    } catch (error) {
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -168,9 +178,9 @@ const Login = () => {
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isSubmitting || isLoading}>
                 <LogIn className="mr-2 h-4 w-4" />
-                Sign in
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
           </Form>
