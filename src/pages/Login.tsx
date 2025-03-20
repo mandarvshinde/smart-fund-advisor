@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
-import AuthLayout from "@/components/auth/AuthLayout";
+import GrowwAuthLayout from "@/components/auth/GrowwAuthLayout";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -85,7 +85,7 @@ const Login = () => {
   };
 
   return (
-    <AuthLayout 
+    <GrowwAuthLayout 
       title="Sign in to your account"
       subtitle={
         <>
@@ -174,7 +174,7 @@ const Login = () => {
           </Button>
         </form>
       </Form>
-    </AuthLayout>
+    </GrowwAuthLayout>
   );
 };
 

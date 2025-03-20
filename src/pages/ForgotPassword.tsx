@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import AuthLayout from "@/components/auth/AuthLayout";
+import GrowwAuthLayout from "@/components/auth/GrowwAuthLayout";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <AuthLayout 
+    <GrowwAuthLayout 
       title="Reset your password"
       subtitle="Enter your email address and we'll send you a link to reset your password."
     >
@@ -88,7 +88,7 @@ const ForgotPassword = () => {
           Back to login
         </Link>
       </div>
-    </AuthLayout>
+    </GrowwAuthLayout>
   );
 };
 
