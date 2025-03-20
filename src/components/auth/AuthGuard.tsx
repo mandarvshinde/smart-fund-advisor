@@ -1,6 +1,6 @@
 
-import { ReactNode } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 
 interface AuthGuardProps {
@@ -10,6 +10,14 @@ interface AuthGuardProps {
 const AuthGuard = ({ children }: AuthGuardProps) => {
   const { user, isLoading } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is logged out after being authenticated, redirect to login
+    if (!isLoading && !user) {
+      navigate('/login', { state: { from: location }, replace: true });
+    }
+  }, [user, isLoading, navigate, location]);
 
   if (isLoading) {
     // Display a simple loading state while checking user session

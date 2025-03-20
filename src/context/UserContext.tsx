@@ -9,6 +9,7 @@ interface UserContextProps {
   isLoading: boolean;
   updateUser: (updatedUser: User) => Promise<void>;
   toggleAgenticAI: () => Promise<void>;
+  logout: () => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -81,8 +82,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const logout = () => {
+    setUser(null);
+  };
+
   return (
-    <UserContext.Provider value={{ user, isLoading, updateUser, toggleAgenticAI }}>
+    <UserContext.Provider value={{ user, isLoading, updateUser, toggleAgenticAI, logout }}>
       {children}
     </UserContext.Provider>
   );
