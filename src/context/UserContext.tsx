@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { User } from '@/types';
@@ -33,6 +32,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           await fetchUserProfile(session.user);
         } else {
           setUser(null);
+          setIsLoading(false); // Make sure we set loading to false when there's no session
         }
       }
     );
@@ -77,10 +77,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .single();
 
       if (error) {
-        throw error;
-      }
-
-      if (data) {
+        console.error('Failed to fetch profile:', error);
+        // If we can't fetch the profile, still create a user object from auth data
+        setUser({
+          id: supabaseUser.id,
+          name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
+          email: supabaseUser.email || "",
+          profileImage: null,
+          riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
+          agenticAIEnabled: false,
+        });
+      } else if (data) {
         setUser({
           id: data.id,
           name: data.name || supabaseUser.user_metadata.name || "User",
@@ -94,7 +101,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Fallback to user metadata if profile doesn't exist yet
         setUser({
           id: supabaseUser.id,
-          name: supabaseUser.user_metadata.name || "User",
+          name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
           email: supabaseUser.email || "",
           profileImage: null,
           riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
@@ -103,9 +110,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      // If we encounter an error, still create a user object from auth data
+      setUser({
+        id: supabaseUser.id,
+        name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
+        email: supabaseUser.email || "",
+        profileImage: null,
+        riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
+        agenticAIEnabled: false,
+      });
       toast({
         title: 'Error',
-        description: 'Failed to load user profile. Please try again.',
+        description: 'Failed to load user profile. Using basic profile information.',
         variant: 'destructive',
       });
     } finally {
