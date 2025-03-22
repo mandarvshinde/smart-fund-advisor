@@ -40,9 +40,14 @@ const ForgotPassword = () => {
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     try {
       setIsSubmitting(true);
-      // Actually call Supabase to reset password
+      
+      // Generate the reset password URL with the reset-password route
+      const resetPasswordURL = `${window.location.origin}/reset-password`;
+      console.log("Setting redirect to:", resetPasswordURL);
+      
+      // Call Supabase to reset password with the proper redirect
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: resetPasswordURL,
       });
       
       if (error) throw error;
