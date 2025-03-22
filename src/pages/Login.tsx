@@ -55,13 +55,18 @@ const Login = () => {
     try {
       setIsSubmitting(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("Attempting login with:", data.email);
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
       
+      console.log("Login successful, user:", authData?.user);
       toast({
         title: "Login Successful",
         description: "Welcome back to SmartFund!",
@@ -70,9 +75,20 @@ const Login = () => {
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      let errorMessage = "Please check your credentials and try again.";
+      
+      if (error.message) {
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Invalid email or password. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Login Failed",
-        description: error.message || "Please check your credentials and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

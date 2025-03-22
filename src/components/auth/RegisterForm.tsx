@@ -54,8 +54,9 @@ const RegisterForm = () => {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Registering with:", data.email);
       
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -66,7 +67,12 @@ const RegisterForm = () => {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Registration error:', error);
+        throw error;
+      }
+      
+      console.log("Registration successful:", authData);
       
       toast({
         title: "Registration Successful",
@@ -77,9 +83,20 @@ const RegisterForm = () => {
       navigate('/login');
     } catch (error: any) {
       console.error('Registration error:', error);
+      
+      let errorMessage = "There was an error creating your account. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes("User already registered")) {
+          errorMessage = "This email is already registered. Please use another email or try logging in.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Registration Failed",
-        description: error.message || "There was an error creating your account. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

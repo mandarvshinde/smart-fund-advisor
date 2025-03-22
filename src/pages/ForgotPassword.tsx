@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Mail } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import GrowwAuthLayout from "@/components/auth/GrowwAuthLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -26,6 +28,7 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPassword = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -36,19 +39,27 @@ const ForgotPassword = () => {
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     try {
-      // In a real app, you would call your auth service here
-      console.log("Reset password for:", data.email);
+      setIsSubmitting(true);
+      // Actually call Supabase to reset password
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      
+      if (error) throw error;
       
       toast({
         title: "Password Reset Email Sent",
         description: "If an account exists with this email, you will receive instructions to reset your password.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Reset password error:", error);
       toast({
         title: "Error",
-        description: "There was a problem sending the password reset email. Please try again.",
+        description: error.message || "There was a problem sending the password reset email. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,9 +84,9 @@ const ForgotPassword = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             <Mail className="mr-2 h-4 w-4" />
-            Send Reset Instructions
+            {isSubmitting ? "Sending..." : "Send Reset Instructions"}
           </Button>
         </form>
       </Form>
