@@ -1,14 +1,28 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 
 const Index = () => {
   const { isLoading, session } = useUser();
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   useEffect(() => {
     document.title = 'SmartFund - Intelligent Mutual Fund Portfolio Management';
+    
+    // Safety timeout to prevent infinite loading
+    const timer = setTimeout(() => {
+      setLoadingTimeout(true);
+    }, 5000); // 5 seconds timeout
+    
+    return () => clearTimeout(timer);
   }, []);
+
+  // If loading takes too long, force navigation to login
+  if (loadingTimeout && isLoading) {
+    console.log("Loading timeout reached, forcing navigation");
+    return <Navigate to="/login" replace />;
+  }
 
   // Show loading indicator while auth state is being determined
   if (isLoading) {
