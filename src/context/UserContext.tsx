@@ -3,10 +3,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { User } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserContextProps {
   user: User | null;
+  session: Session | null;
   isLoading: boolean;
   updateUser: (updatedUser: User) => Promise<void>;
   toggleAgenticAI: () => Promise<void>;
@@ -25,6 +26,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.email);
         setSession(session);
         
         if (session?.user) {
@@ -40,9 +42,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         setIsLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("Got existing session:", session?.user?.email);
         
         if (session?.user) {
           await fetchUserProfile(session.user);
+        } else {
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -51,7 +56,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           description: 'Failed to initialize authentication. Please try again.',
           variant: 'destructive',
         });
-      } finally {
         setIsLoading(false);
       }
     };
@@ -65,6 +69,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log("Fetching profile for user:", supabaseUser.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -78,11 +83,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (data) {
         setUser({
           id: data.id,
-          name: data.name,
-          email: data.email,
+          name: data.name || supabaseUser.user_metadata.name || "User",
+          email: data.email || supabaseUser.email || "",
           profileImage: data.profile_image,
           riskAppetite: data.risk_appetite as 'low' | 'moderate' | 'high',
           agenticAIEnabled: data.agentic_ai_enabled,
+        });
+      } else {
+        console.log("No profile found, creating from metadata");
+        // Fallback to user metadata if profile doesn't exist yet
+        setUser({
+          id: supabaseUser.id,
+          name: supabaseUser.user_metadata.name || "User",
+          email: supabaseUser.email || "",
+          profileImage: null,
+          riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
+          agenticAIEnabled: false,
         });
       }
     } catch (error) {
@@ -178,7 +194,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, isLoading, updateUser, toggleAgenticAI, logout }}>
+    <UserContext.Provider value={{ user, session, isLoading, updateUser, toggleAgenticAI, logout }}>
       {children}
     </UserContext.Provider>
   );

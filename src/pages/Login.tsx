@@ -24,7 +24,7 @@ import GrowwAuthLayout from "@/components/auth/GrowwAuthLayout";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  password: z.string().min(1, { message: "Password is required" }),
   rememberMe: z.boolean().optional(),
 });
 
@@ -80,7 +80,9 @@ const Login = () => {
       
       if (error.message) {
         if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Invalid email or password. Please try again.";
+          errorMessage = "Invalid email or password. Please try again or check if your email has been confirmed.";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Please confirm your email before logging in. Check your inbox for a confirmation link.";
         } else {
           errorMessage = error.message;
         }

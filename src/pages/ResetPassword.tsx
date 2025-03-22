@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,11 +23,7 @@ import GrowwAuthLayout from "@/components/auth/GrowwAuthLayout";
 const resetPasswordSchema = z.object({
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" })
-    .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character" }),
+    .min(8, { message: "Password must be at least 8 characters" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -47,17 +42,30 @@ const ResetPassword = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   
-  // Redirect to dashboard if already logged in
   useEffect(() => {
-    if (!accessToken) {
-      toast({
-        title: "Error",
-        description: "Invalid or missing reset token. Please try the password reset process again.",
-        variant: "destructive",
-      });
-    }
+    // When the component loads with an access token, set the session
+    const setSession = async () => {
+      if (accessToken) {
+        console.log("Setting session with access token");
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: "", // We don't have the refresh token from the URL
+        });
+        
+        if (error) {
+          console.error("Error setting session:", error);
+          toast({
+            title: "Error",
+            description: "Invalid or expired reset token. Please try the password reset process again.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    
+    setSession();
   }, [accessToken, toast]);
-
+  
   // If user is already logged in, redirect to dashboard
   if (user) {
     return <Navigate to="/dashboard" replace />;

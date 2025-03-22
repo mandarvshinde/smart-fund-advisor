@@ -56,6 +56,7 @@ const RegisterForm = () => {
       setIsSubmitting(true);
       console.log("Registering with:", data.email);
       
+      // Create user with Supabase
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -64,6 +65,8 @@ const RegisterForm = () => {
             name: data.name,
             risk_appetite: data.riskAppetite,
           },
+          // Don't require email confirmation for a better testing experience
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
       
@@ -74,10 +77,22 @@ const RegisterForm = () => {
       
       console.log("Registration successful:", authData);
       
-      toast({
-        title: "Registration Successful",
-        description: "Welcome to SmartFund! Please check your email to verify your account.",
-      });
+      // Show different message based on whether email confirmation is required
+      if (!authData?.user?.email_confirmed_at) {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created. You can now sign in with your credentials.",
+        });
+      } else {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created and you're now signed in.",
+        });
+        
+        // If email is confirmed automatically, navigate to dashboard
+        navigate('/dashboard');
+        return;
+      }
       
       // Navigate to login page after successful registration
       navigate('/login');

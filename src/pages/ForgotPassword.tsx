@@ -56,6 +56,9 @@ const ForgotPassword = () => {
         title: "Password Reset Email Sent",
         description: "If an account exists with this email, you will receive instructions to reset your password.",
       });
+      
+      // Clear the form
+      form.reset();
     } catch (error: any) {
       console.error("Reset password error:", error);
       toast({
