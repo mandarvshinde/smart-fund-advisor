@@ -1,450 +1,468 @@
-import { Fund } from "@/types/fundTypes";
+
+import { MutualFund, Investment, Goal, Recommendation, MarketInsight, Fund } from '@/types';
 
 // Mock data for mutual funds
-export const mockFunds: Fund[] = [
+export const mockMutualFunds: MutualFund[] = [
   {
-    schemeCode: "119551",
-    schemeName: "Axis Bluechip Fund Direct Plan Growth",
-    nav: "49.93",
-    date: "13-04-2025",
-    fundHouse: "Axis Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 18.7,
-    }
+    id: '101',
+    name: 'HDFC Mid-Cap Opportunities Fund',
+    category: 'Equity',
+    subcategory: 'Mid Cap',
+    nav: 135.67,
+    oneYearReturn: 18.5,
+    threeYearReturn: 45.2,
+    fiveYearReturn: 85.7,
+    riskLevel: 'moderate',
+    expenseRatio: 1.25,
+    aum: 4500,
+    fundManager: 'Chirag Setalvad',
+    fundHouse: 'HDFC Mutual Fund'
   },
   {
-    schemeCode: "122639",
-    schemeName: "SBI Equity Hybrid Fund Direct Growth",
-    nav: "255.59",
-    date: "13-04-2025",
-    fundHouse: "SBI Mutual Fund",
-    category: "hybrid",
-    returns: {
-      oneYear: 15.3,
-    }
+    id: '102',
+    name: 'Axis Bluechip Fund',
+    category: 'Equity',
+    subcategory: 'Large Cap',
+    nav: 45.89,
+    oneYearReturn: 15.2,
+    threeYearReturn: 35.1,
+    fiveYearReturn: 65.4,
+    riskLevel: 'low',
+    expenseRatio: 0.95,
+    aum: 7800,
+    fundManager: 'Shreyas Devalkar',
+    fundHouse: 'Axis Mutual Fund'
   },
   {
-    schemeCode: "118568",
-    schemeName: "HDFC Mid-Cap Opportunities Fund Direct Plan Growth",
-    nav: "122.88",
-    date: "13-04-2025",
-    fundHouse: "HDFC Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 22.6,
-    }
+    id: '103',
+    name: 'SBI Small Cap Fund',
+    category: 'Equity',
+    subcategory: 'Small Cap',
+    nav: 89.23,
+    oneYearReturn: 22.7,
+    threeYearReturn: 52.3,
+    fiveYearReturn: 95.2,
+    riskLevel: 'high',
+    expenseRatio: 1.75,
+    aum: 2800,
+    fundManager: 'R. Srinivasan',
+    fundHouse: 'SBI Mutual Fund'
   },
   {
-    schemeCode: "118560",
-    schemeName: "Kotak Corporate Bond Fund Direct Growth",
-    nav: "3354.45",
-    date: "13-04-2025",
-    fundHouse: "Kotak Mahindra Mutual Fund",
-    category: "debt",
-    returns: {
-      oneYear: 7.2,
-    }
+    id: '104',
+    name: 'Kotak Tax Saver Fund',
+    category: 'Equity',
+    subcategory: 'ELSS Tax Saving',
+    nav: 56.78,
+    oneYearReturn: 16.9,
+    threeYearReturn: 38.6,
+    fiveYearReturn: 72.1,
+    riskLevel: 'moderate',
+    expenseRatio: 1.45,
+    aum: 1950,
+    fundManager: 'Harsha Upadhyaya',
+    fundHouse: 'Kotak Mutual Fund'
   },
   {
-    schemeCode: "119598",
-    schemeName: "Nippon India Small Cap Fund Direct Growth Plan",
-    nav: "108.54",
-    date: "13-04-2025",
-    fundHouse: "Nippon India Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 25.4,
-    }
+    id: '105',
+    name: 'ICICI Prudential Balanced Advantage Fund',
+    category: 'Hybrid',
+    subcategory: 'Dynamic Asset Allocation',
+    nav: 78.34,
+    oneYearReturn: 14.3,
+    threeYearReturn: 32.8,
+    fiveYearReturn: 58.9,
+    riskLevel: 'low',
+    expenseRatio: 1.15,
+    aum: 5600,
+    fundManager: 'S. Naren',
+    fundHouse: 'ICICI Prudential Mutual Fund'
   },
   {
-    schemeCode: "120505",
-    schemeName: "Mirae Asset Large Cap Fund Direct Plan Growth",
-    nav: "97.72",
-    date: "13-04-2025",
-    fundHouse: "Mirae Asset Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 16.9,
-    }
+    id: '106',
+    name: 'Aditya Birla Sun Life Corporate Bond Fund',
+    category: 'Debt',
+    subcategory: 'Corporate Bond',
+    nav: 34.56,
+    oneYearReturn: 8.2,
+    threeYearReturn: 22.9,
+    fiveYearReturn: 41.3,
+    riskLevel: 'low',
+    expenseRatio: 0.65,
+    aum: 4200,
+    fundManager: 'Maneesh Dangi',
+    fundHouse: 'Aditya Birla Sun Life Mutual Fund'
+  }
+];
+
+// Mock data for investments
+export const mockInvestments: Investment[] = [
+  {
+    id: '201',
+    fundId: '101',
+    investmentType: 'SIP',
+    amount: 5000,
+    units: 36.854,
+    startDate: '2021-06-15',
+    lastTransactionDate: '2023-01-15',
+    sipFrequency: 'monthly',
+    currentValue: 250000,
+    totalInvested: 200000,
+    absoluteReturn: 25,
+    annualizedReturn: 12.5
   },
   {
-    schemeCode: "118560",
-    schemeName: "Aditya Birla Sun Life Corporate Bond Fund Direct Growth",
-    nav: "89.92",
-    date: "13-04-2025",
-    fundHouse: "Aditya Birla Sun Life Mutual Fund",
-    category: "debt",
-    returns: {
-      oneYear: 6.8,
-    }
+    id: '202',
+    fundId: '102',
+    investmentType: 'lumpsum',
+    amount: 100000,
+    units: 2179.125,
+    startDate: '2022-03-10',
+    lastTransactionDate: '2022-03-10',
+    currentValue: 115000,
+    totalInvested: 100000,
+    absoluteReturn: 15,
+    annualizedReturn: 16.2
   },
   {
-    schemeCode: "119600",
-    schemeName: "ICICI Prudential Ultra Short Term Fund Direct Plan Growth",
-    nav: "24.66",
-    date: "13-04-2025",
-    fundHouse: "ICICI Prudential Mutual Fund",
-    category: "debt",
-    returns: {
-      oneYear: 5.9,
-    }
-  },
-  {
-    schemeCode: "118561",
-    schemeName: "Parag Parikh Flexi Cap Fund Direct Growth",
-    nav: "62.14",
-    date: "13-04-2025",
-    fundHouse: "PPFAS Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 19.8,
-    }
-  },
-  {
-    schemeCode: "119709",
-    schemeName: "UTI Nifty Index Fund Direct Growth",
-    nav: "143.25",
-    date: "13-04-2025",
-    fundHouse: "UTI Mutual Fund",
-    category: "other",
-    returns: {
-      oneYear: 17.2,
-    }
-  },
-  {
-    schemeCode: "119710",
-    schemeName: "DSP Midcap Fund Direct Plan Growth",
-    nav: "96.48",
-    date: "13-04-2025",
-    fundHouse: "DSP Mutual Fund",
-    category: "equity",
-    returns: {
-      oneYear: 21.5,
-    }
-  },
-  {
-    schemeCode: "119711",
-    schemeName: "Franklin India Ultra Short Bond Fund Super Institutional Direct Growth",
-    nav: "32.87",
-    date: "13-04-2025",
-    fundHouse: "Franklin Templeton Mutual Fund",
-    category: "debt",
-    returns: {
-      oneYear: 5.6,
-    }
+    id: '203',
+    fundId: '105',
+    investmentType: 'SIP',
+    amount: 10000,
+    units: 127.65,
+    startDate: '2020-11-22',
+    lastTransactionDate: '2023-01-22',
+    sipFrequency: 'monthly',
+    currentValue: 350000,
+    totalInvested: 300000,
+    absoluteReturn: 16.67,
+    annualizedReturn: 8.3
   }
 ];
 
 // Mock data for goals
-export const mockGoals = [
+export const mockGoals: Goal[] = [
   {
-    id: "1",
-    title: "Home Down Payment",
-    targetAmount: 2500000,
-    currentAmount: 750000,
-    targetDate: "2028-03-01",
-    createdAt: "2023-01-15",
-    icon: "home",
-    progress: 30,
+    id: '301',
+    name: 'Retirement',
+    targetAmount: 2000000,
+    currentAmount: 350000,
+    targetDate: '2045-01-01',
+    investments: ['201', '203'],
+    progress: 17.5,
+    riskAppetite: 'moderate',
+    monthlyContribution: 15000,
+    expectedReturn: 12
   },
   {
-    id: "2",
-    title: "Child's Education",
+    id: '302',
+    name: 'Home Purchase',
     targetAmount: 5000000,
-    currentAmount: 1200000,
-    targetDate: "2030-06-01",
-    createdAt: "2022-12-05",
-    icon: "graduation-cap",
-    progress: 24,
+    currentAmount: 1250000,
+    targetDate: '2028-06-30',
+    investments: ['202'],
+    progress: 25,
+    riskAppetite: 'low',
+    monthlyContribution: 30000,
+    expectedReturn: 8
   },
   {
-    id: "3",
-    title: "Retirement Fund",
-    targetAmount: 10000000,
-    currentAmount: 2500000,
-    targetDate: "2045-05-01",
-    createdAt: "2020-06-10",
-    icon: "umbrella",
-    progress: 25,
+    id: '303',
+    name: 'Child Education',
+    targetAmount: 1500000,
+    currentAmount: 600000,
+    targetDate: '2030-04-15',
+    investments: [],
+    progress: 40,
+    riskAppetite: 'high',
+    monthlyContribution: 10000,
+    expectedReturn: 15
+  }
+];
+
+// Mock data for recommendations
+export const mockRecommendations: Recommendation[] = [
+  {
+    id: '401',
+    type: 'buy',
+    description: 'Add SBI Small Cap Fund to your portfolio',
+    recommendedFundId: '103',
+    reason: 'Small caps are likely to outperform in the current market environment',
+    potentialBenefit: 'Higher returns due to small cap rally',
+    riskLevel: 'high',
+    date: '2023-01-05',
+    isActioned: false
   },
+  {
+    id: '402',
+    type: 'increase_sip',
+    description: 'Increase your SIP in HDFC Mid-Cap Opportunities Fund',
+    currentFundId: '101',
+    reason: 'You are underinvested in mid-caps compared to your risk profile',
+    potentialBenefit: 'Better portfolio balancing and potential for higher returns',
+    riskLevel: 'moderate',
+    date: '2023-01-10',
+    isActioned: true
+  },
+  {
+    id: '403',
+    type: 'switch',
+    description: 'Switch from Aditya Birla Sun Life Corporate Bond Fund to ICICI Prudential Balanced Advantage Fund',
+    currentFundId: '106',
+    recommendedFundId: '105',
+    reason: 'Interest rates are likely to rise, which may impact debt funds',
+    potentialBenefit: 'Protection against interest rate risk and better returns',
+    riskLevel: 'low',
+    date: '2023-01-15',
+    isActioned: false
+  }
 ];
 
 // Mock data for market insights
+export const mockMarketInsights: MarketInsight[] = [
+  {
+    id: '501',
+    title: 'RBI Hikes Interest Rate by 25 bps',
+    description: 'The Reserve Bank of India raised its key lending rate by 25 basis points as inflation concerns remain.',
+    category: 'economy',
+    impact: 'negative',
+    date: '2023-01-05',
+    source: 'Economic Times'
+  },
+  {
+    id: '502',
+    title: 'IT Sector Shows Strong Q3 Results',
+    description: 'Major IT companies have reported better than expected Q3 results, driven by digital transformation deals.',
+    category: 'sector',
+    impact: 'positive',
+    date: '2023-01-12',
+    source: 'Business Standard'
+  },
+  {
+    id: '503',
+    title: 'Government Announces New Infrastructure Projects',
+    description: 'The government has announced infrastructure projects worth ₹2 lakh crore to boost economic growth.',
+    category: 'policy',
+    impact: 'positive',
+    date: '2023-01-18',
+    source: 'Financial Express'
+  }
+];
+
+// Mock data for chat messages
+export const mockChatMessages = [
+  {
+    id: '601',
+    sender: 'user',
+    content: 'How should I invest ₹10,000 per month?',
+    timestamp: '2023-01-15T10:30:00'
+  },
+  {
+    id: '602',
+    sender: 'ai',
+    content: 'Based on your risk profile, I recommend a diversified approach: 60% in equity funds like HDFC Mid-Cap Opportunities Fund, 30% in balanced funds like ICICI Prudential Balanced Advantage Fund, and 10% in debt funds for stability.',
+    timestamp: '2023-01-15T10:30:30'
+  },
+  {
+    id: '603',
+    sender: 'user',
+    content: 'What is the difference between SIP and lumpsum investment?',
+    timestamp: '2023-01-15T10:31:15'
+  },
+  {
+    id: '604',
+    sender: 'ai',
+    content: 'A SIP (Systematic Investment Plan) allows you to invest a fixed amount regularly (usually monthly) over a period of time, while a lumpsum investment is when you invest the entire amount at once. SIPs help in rupee cost averaging and reducing the impact of market volatility.',
+    timestamp: '2023-01-15T10:31:45'
+  }
+];
+
+// Mock market data (for dashboard)
 export const mockMarketData = {
   indices: [
-    { name: "Sensex", value: 72563.15, change: 0.89 },
-    { name: "Nifty 50", value: 21943.25, change: 0.83 },
-    { name: "Nifty Bank", value: 47568.50, change: 1.25 },
+    { name: 'NIFTY 50', value: 17865.75, change: 1.25 },
+    { name: 'SENSEX', value: 59958.42, change: 1.18 },
+    { name: 'NIFTY Bank', value: 41829.30, change: 0.95 },
+    { name: 'NIFTY IT', value: 29574.15, change: -0.45 }
   ],
   topGainers: [
-    { name: "Tata Motors", change: 3.87 },
-    { name: "Bajaj Finance", change: 3.25 },
-    { name: "HDFC Bank", change: 2.93 },
+    { name: 'Adani Ports', change: 3.78 },
+    { name: 'HDFC Bank', change: 2.65 },
+    { name: 'Axis Bank', change: 2.42 },
+    { name: 'Tata Motors', change: 2.35 }
   ],
   topLosers: [
-    { name: "Infosys", change: -1.45 },
-    { name: "HUL", change: -0.98 },
-    { name: "Bharti Airtel", change: -0.75 },
+    { name: 'Tech Mahindra', change: -1.89 },
+    { name: 'HCL Tech', change: -1.65 },
+    { name: 'Infosys', change: -1.28 },
+    { name: 'TCS', change: -0.95 }
   ],
-};
-
-// Mock portfolio data
-export const mockPortfolioData = {
-  totalValue: 875000,
-  invested: 750000,
-  returns: 125000,
-  returnPercentage: 16.67,
-  allocation: [
-    { category: "Equity", value: 60 },
-    { category: "Debt", value: 30 },
-    { category: "Gold", value: 5 },
-    { category: "Others", value: 5 },
-  ],
-  funds: [
+  insights: [
     { 
-      name: "Axis Bluechip Fund", 
-      value: 210000, 
-      invested: 180000, 
-      returns: 30000, 
-      returnPercentage: 16.67 
+      id: '701',
+      title: 'Budget 2023 Expectations',
+      snippet: 'Markets are expecting increased capex and fiscal consolidation in the upcoming budget.',
+      date: '2023-01-18',
+      category: 'economy'
     },
     { 
-      name: "HDFC Small Cap Fund", 
-      value: 190000, 
-      invested: 150000, 
-      returns: 40000, 
-      returnPercentage: 26.67
+      id: '702',
+      title: 'Earnings Season Update',
+      snippet: 'Most companies have reported in-line or better than expected Q3 results so far.',
+      date: '2023-01-17',
+      category: 'market'
     },
     { 
-      name: "SBI Balanced Advantage Fund", 
-      value: 175000, 
-      invested: 150000, 
-      returns: 25000, 
-      returnPercentage: 16.67
-    },
-    { 
-      name: "Kotak Corporate Bond Fund", 
-      value: 195000, 
-      invested: 180000, 
-      returns: 15000, 
-      returnPercentage: 8.33
-    },
-    { 
-      name: "DSP Gold ETF", 
-      value: 105000, 
-      invested: 90000, 
-      returns: 15000, 
-      returnPercentage: 16.67
-    },
+      id: '703',
+      title: 'FII Flows Turn Positive',
+      snippet: 'After months of selling, FIIs have turned net buyers in the Indian market.',
+      date: '2023-01-16',
+      category: 'market'
+    }
   ]
 };
 
-// Mock data functions for useQuery hooks
-export const fetchInvestments = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    {
-      id: "1",
-      fundName: "Axis Bluechip Fund",
-      currentValue: 210000,
-      totalInvested: 180000,
-      absoluteReturn: 30000,
-      annualizedReturn: 16.67
-    },
-    {
-      id: "2",
-      fundName: "HDFC Small Cap Fund",
-      currentValue: 190000,
-      totalInvested: 150000,
-      absoluteReturn: 40000,
-      annualizedReturn: 26.67
-    },
-    {
-      id: "3",
-      fundName: "SBI Balanced Advantage Fund",
-      currentValue: 175000,
-      totalInvested: 150000,
-      absoluteReturn: 25000,
-      annualizedReturn: 16.67
-    },
-    {
-      id: "4",
-      fundName: "Kotak Corporate Bond Fund",
-      currentValue: 195000,
-      totalInvested: 180000,
-      absoluteReturn: 15000,
-      annualizedReturn: 8.33
+// Mock funds for API data
+export const mockFunds: Fund[] = [
+  {
+    schemeCode: '100027',
+    schemeName: 'HDFC Flexi Cap Fund - Direct Plan - Growth',
+    nav: '927.25',
+    date: '12-Apr-2023',
+    fundHouse: 'HDFC Mutual Fund',
+    category: 'Equity: Flexi Cap',
+    returns: {
+      oneYear: 16.8,
+      threeYear: 42.5,
+      fiveYear: 82.3
     }
-  ];
+  },
+  {
+    schemeCode: '118989',
+    schemeName: 'Axis Bluechip Fund - Direct Plan - Growth',
+    nav: '45.89',
+    date: '12-Apr-2023',
+    fundHouse: 'Axis Mutual Fund',
+    category: 'Equity: Large Cap',
+    returns: {
+      oneYear: 15.2,
+      threeYear: 35.1,
+      fiveYear: 65.4
+    }
+  },
+  {
+    schemeCode: '135796',
+    schemeName: 'SBI Small Cap Fund - Direct Plan - Growth',
+    nav: '120.63',
+    date: '12-Apr-2023',
+    fundHouse: 'SBI Mutual Fund',
+    category: 'Equity: Small Cap',
+    returns: {
+      oneYear: 22.7,
+      threeYear: 52.3,
+      fiveYear: 95.2
+    }
+  },
+  {
+    schemeCode: '147363',
+    schemeName: 'Mirae Asset Emerging Bluechip Fund - Direct Plan - Growth',
+    nav: '101.25',
+    date: '12-Apr-2023',
+    fundHouse: 'Mirae Asset Mutual Fund',
+    category: 'Equity: Large & Mid Cap',
+    returns: {
+      oneYear: 18.9,
+      threeYear: 45.6,
+      fiveYear: 88.7
+    }
+  },
+  {
+    schemeCode: '120505',
+    schemeName: 'Parag Parikh Flexi Cap Fund - Direct Plan - Growth',
+    nav: '56.78',
+    date: '12-Apr-2023',
+    fundHouse: 'PPFAS Mutual Fund',
+    category: 'Equity: Flexi Cap',
+    returns: {
+      oneYear: 19.5,
+      threeYear: 48.3,
+      fiveYear: 92.1
+    }
+  },
+  {
+    schemeCode: '118535',
+    schemeName: 'Kotak Emerging Equity Fund - Direct Plan - Growth',
+    nav: '78.34',
+    date: '12-Apr-2023',
+    fundHouse: 'Kotak Mutual Fund',
+    category: 'Equity: Mid Cap',
+    returns: {
+      oneYear: 17.3,
+      threeYear: 44.8,
+      fiveYear: 86.5
+    }
+  },
+  {
+    schemeCode: '122639',
+    schemeName: 'Edelweiss Balanced Advantage Fund - Direct Plan - Growth',
+    nav: '34.56',
+    date: '12-Apr-2023',
+    fundHouse: 'Edelweiss Mutual Fund',
+    category: 'Hybrid: Balanced Advantage',
+    returns: {
+      oneYear: 12.7,
+      threeYear: 32.5,
+      fiveYear: 58.9
+    }
+  },
+  {
+    schemeCode: '118560',
+    schemeName: 'ICICI Prudential Bluechip Fund - Direct Plan - Growth',
+    nav: '67.89',
+    date: '12-Apr-2023',
+    fundHouse: 'ICICI Prudential Mutual Fund',
+    category: 'Equity: Large Cap',
+    returns: {
+      oneYear: 14.8,
+      threeYear: 38.7,
+      fiveYear: 71.2
+    }
+  }
+];
+
+// Add missing functions
+export const fetchInvestments = async (): Promise<Investment[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return mockInvestments;
 };
 
-export const fetchGoals = async () => {
-  // Simulate API delay
+export const fetchMutualFunds = async (): Promise<MutualFund[]> => {
+  // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
+  return mockMutualFunds;
+};
+
+export const fetchGoals = async (): Promise<Goal[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 900));
   return mockGoals;
 };
 
-export const fetchGoalById = async (id: string) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return mockGoals.find(goal => goal.id === id);
+export const fetchRecommendations = async (): Promise<Recommendation[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 750));
+  return mockRecommendations;
 };
 
-export const fetchMarketInsights = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return {
-    indices: mockMarketData.indices,
-    topGainers: mockMarketData.topGainers,
-    topLosers: mockMarketData.topLosers,
-    insights: [
-      {
-        id: "1",
-        title: "RBI Monetary Policy Update",
-        snippet: "RBI keeps repo rate unchanged at 6.5%, maintains 'withdrawal of accommodation' stance",
-        date: "2025-04-10",
-        category: "policy"
-      },
-      {
-        id: "2",
-        title: "Q4 Results Season Begins",
-        snippet: "IT companies kick off the earnings season with mixed results",
-        date: "2025-04-12",
-        category: "market"
-      },
-      {
-        id: "3",
-        title: "Auto Sector Performance",
-        snippet: "Auto sales rise 15% YoY in March, signaling strong demand",
-        date: "2025-04-07",
-        category: "sector"
-      }
-    ]
-  };
+export const fetchMarketInsights = async (): Promise<MarketInsight[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 850));
+  return mockMarketInsights;
 };
 
-export const fetchMutualFunds = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    {
-      id: "1",
-      name: "Axis Bluechip Fund Direct Plan Growth",
-      category: "Equity",
-      subcategory: "Large Cap",
-      nav: 49.93,
-      oneYearReturn: 18.7,
-      threeYearReturn: 15.3,
-      fiveYearReturn: 12.8,
-      riskLevel: "moderate",
-      expenseRatio: 0.54,
-      aum: 22586,
-      fundManager: "Shreyash Devalkar",
-      fundHouse: "Axis Mutual Fund"
-    },
-    {
-      id: "2",
-      name: "HDFC Mid-Cap Opportunities Fund Direct Plan Growth",
-      category: "Equity",
-      subcategory: "Mid Cap",
-      nav: 122.88,
-      oneYearReturn: 22.6,
-      threeYearReturn: 19.5,
-      fiveYearReturn: 16.2,
-      riskLevel: "high",
-      expenseRatio: 0.68,
-      aum: 31452,
-      fundManager: "Chirag Setalvad",
-      fundHouse: "HDFC Mutual Fund"
-    },
-    {
-      id: "3",
-      name: "SBI Equity Hybrid Fund Direct Growth",
-      category: "Hybrid",
-      subcategory: "Aggressive Hybrid",
-      nav: 255.59,
-      oneYearReturn: 15.3,
-      threeYearReturn: 13.6,
-      fiveYearReturn: 11.9,
-      riskLevel: "moderate",
-      expenseRatio: 0.72,
-      aum: 49621,
-      fundManager: "Dinesh Balachandran",
-      fundHouse: "SBI Mutual Fund"
-    },
-    {
-      id: "4",
-      name: "Kotak Corporate Bond Fund Direct Growth",
-      category: "Debt",
-      subcategory: "Corporate Bond",
-      nav: 3354.45,
-      oneYearReturn: 7.2,
-      threeYearReturn: 6.8,
-      fiveYearReturn: 7.4,
-      riskLevel: "low",
-      expenseRatio: 0.35,
-      aum: 15782,
-      fundManager: "Deepak Agrawal",
-      fundHouse: "Kotak Mahindra Mutual Fund"
-    },
-    {
-      id: "5",
-      name: "Parag Parikh Flexi Cap Fund Direct Growth",
-      category: "Equity",
-      subcategory: "Flexi Cap",
-      nav: 62.14,
-      oneYearReturn: 19.8,
-      threeYearReturn: 18.5,
-      fiveYearReturn: 17.2,
-      riskLevel: "moderate",
-      expenseRatio: 0.86,
-      aum: 27845,
-      fundManager: "Rajeev Thakkar",
-      fundHouse: "PPFAS Mutual Fund"
-    }
-  ];
-};
-
-export const fetchRecommendations = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    {
-      id: "1",
-      title: "Increase SIP in Small Cap Funds",
-      description: "Small cap segment is showing strong potential for next 2-3 years",
-      actionType: "increase_sip",
-      impact: "high",
-      fundName: "Nippon India Small Cap Fund",
-      isActioned: false
-    },
-    {
-      id: "2",
-      title: "Rebalance Portfolio",
-      description: "Your portfolio is overweight on large caps, consider diversifying",
-      actionType: "rebalance",
-      impact: "medium",
-      isActioned: false
-    },
-    {
-      id: "3",
-      title: "Add Debt Component",
-      description: "Interest rates are attractive, good time to add debt funds",
-      actionType: "add",
-      impact: "medium",
-      fundName: "ICICI Prudential Corporate Bond Fund",
-      isActioned: true
-    }
-  ];
-};
-
-export const actOnRecommendation = async (id: string) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return { success: true, message: "Recommendation actioned successfully" };
+export const fetchMarketData = async (): Promise<typeof mockMarketData> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 700));
+  return mockMarketData;
 };

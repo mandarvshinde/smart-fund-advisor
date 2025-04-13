@@ -21,8 +21,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Funds from "./pages/Funds";
+import FundDetail from "./pages/FundDetail";
 import Calculator from "./pages/Calculator";
 import Chat from "./pages/Chat";
+import About from "./pages/About";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,8 +50,10 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/funds" element={<Funds />} />
+            <Route path="/funds/:schemeCode" element={<FundDetail />} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/about" element={<About />} />
             
             {/* Protected routes */}
             <Route 

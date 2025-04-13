@@ -15,7 +15,8 @@ import {
   Target,
   Calculator,
   MessageSquare,
-  BarChart3
+  BarChart3,
+  Info
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,6 +45,10 @@ const Navbar = () => {
   const handleSignOut = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const handleWhatsAppChat = () => {
+    window.open('https://wa.me/918446597048?text=Hello,%20I%20am%20interested%20in%20your%20investment%20services.', '_blank');
   };
 
   useEffect(() => {
@@ -116,6 +121,15 @@ const Navbar = () => {
                   <span>AI Advisor</span>
                 </div>
               </Link>
+              <Link
+                to="/about"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
+              >
+                <div className="flex items-center space-x-1">
+                  <Info className="h-4 w-4" />
+                  <span>About Us</span>
+                </div>
+              </Link>
             </div>
           </div>
           
@@ -124,12 +138,10 @@ const Navbar = () => {
               variant="outline" 
               size="sm"
               className="mr-2 hidden sm:flex text-[#8D6E63] border-[#8D6E63] hover:bg-[#EFEBE9]"
-              asChild
+              onClick={handleWhatsAppChat}
             >
-              <Link to="/chat">
-                <MessageSquare className="mr-1.5 h-4 w-4" />
-                Chat with us
-              </Link>
+              <MessageSquare className="mr-1.5 h-4 w-4" />
+              Chat with us
             </Button>
             
             <div className="ml-3 relative">
@@ -241,15 +253,27 @@ const Navbar = () => {
               </div>
             </Link>
             <Link
-              to="/chat"
-              className="block px-3 py-2 rounded-md text-base font-medium bg-[#8D6E63] text-white"
+              to="/about"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63]"
               onClick={toggleMenu}
             >
               <div className="flex items-center space-x-2">
+                <Info className="h-5 w-5" />
+                <span>About Us</span>
+              </div>
+            </Link>
+            <div
+              className="block px-3 py-2 rounded-md text-base font-medium bg-[#8D6E63] text-white"
+              onClick={() => {
+                toggleMenu();
+                handleWhatsAppChat();
+              }}
+            >
+              <div className="flex items-center space-x-2 cursor-pointer">
                 <MessageSquare className="h-5 w-5" />
                 <span>Chat with us</span>
               </div>
-            </Link>
+            </div>
           </div>
         </div>
       )}

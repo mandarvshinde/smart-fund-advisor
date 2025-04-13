@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, Info, TrendingUp, AlertCircle } from "lucide-react";
+import { BarChart3, Info, TrendingUp, AlertCircle, MessageSquare } from "lucide-react";
 import { fetchFundDetails } from "@/services/fundService";
 import { Fund } from "@/types";
 
@@ -23,6 +24,10 @@ export const FundCard = ({ fund }: FundCardProps) => {
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
+  };
+
+  const handleWhatsAppChat = () => {
+    window.open(`https://wa.me/918446597048?text=I'm interested in investing in ${fund.schemeName}. Can you provide more information?`, '_blank');
   };
 
   return (
@@ -93,9 +98,9 @@ export const FundCard = ({ fund }: FundCardProps) => {
         <Button 
           size="sm" 
           className="bg-[#8D6E63] text-white hover:bg-[#6D4C41]"
-          onClick={() => window.open(`/funds/${fund.schemeCode}`, '_blank')}
+          asChild
         >
-          Invest Now
+          <Link to={`/funds/${fund.schemeCode}`}>View Fund</Link>
         </Button>
       </CardFooter>
     </Card>

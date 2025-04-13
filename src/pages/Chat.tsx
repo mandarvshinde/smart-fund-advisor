@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import PageLayout from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Phone, Mail, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Mail, ArrowLeft, Linkedin } from 'lucide-react';
 
 const Chat = () => {
   useEffect(() => {
@@ -44,7 +44,7 @@ const Chat = () => {
             
             <div className="bg-[#EFEBE9] rounded-lg p-4">
               <p className="text-center text-[#5D4037] font-medium">
-                Connect with our investment advisor directly on WhatsApp:
+                For quick assistance, connect with our investment advisor directly on WhatsApp:
                 <span className="block mt-2 font-bold">+91 8446597048</span>
               </p>
             </div>
@@ -53,12 +53,19 @@ const Chat = () => {
               <p className="text-center font-medium">Other ways to reach us:</p>
               <div className="flex justify-center space-x-6">
                 <div className="flex items-center">
-                  <Phone className="h-5 w-5 mr-2 text-[#8D6E63]" />
-                  <span>+91 8446597048</span>
+                  <Mail className="h-5 w-5 mr-2 text-[#8D6E63]" />
+                  <span>kuberitifinancialservices@gmail.com</span>
                 </div>
                 <div className="flex items-center">
-                  <Mail className="h-5 w-5 mr-2 text-[#8D6E63]" />
-                  <span>support@keberiti.com</span>
+                  <Linkedin className="h-5 w-5 mr-2 text-[#8D6E63]" />
+                  <a 
+                    href="https://www.linkedin.com/company/keberiti-financial-services" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    LinkedIn
+                  </a>
                 </div>
               </div>
             </div>

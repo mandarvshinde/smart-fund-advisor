@@ -83,4 +83,4 @@ export type ChatMessage = {
 };
 
 // Re-export Fund types from fundTypes.ts to maintain compatibility
-export { Fund, FundDetails } from './fundTypes';
+export type { Fund, FundDetails } from './fundTypes';
