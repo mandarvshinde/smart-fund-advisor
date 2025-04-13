@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
@@ -26,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Logo from "@/components/brand/Logo";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,10 +55,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <TrendingUp className="h-8 w-8 text-finance-primary" />
-              <span className="ml-2 text-xl font-bold text-finance-primary">SmartFund</span>
-            </Link>
+            <Logo className="flex-shrink-0" />
             
             {/* Desktop Navigation */}
             <div className="hidden md:ml-6 md:flex md:space-x-2">

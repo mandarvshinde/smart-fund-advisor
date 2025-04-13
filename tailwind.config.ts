@@ -65,8 +65,8 @@ export default {
 				},
 				// Custom financial app colors
 				finance: {
-					primary: '#0A6EBD',
-					secondary: '#45CFDD',
+					primary: '#6E4C1E', // Brown color from logo
+					secondary: '#B0813E', // Gold/amber color
 					accent: '#16a34a',
 					muted: '#f3f4f6',
 					warning: '#f59e0b',

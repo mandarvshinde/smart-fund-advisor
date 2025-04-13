@@ -69,7 +69,7 @@ const Login = () => {
       console.log("Login successful, user:", authData?.user);
       toast({
         title: "Login Successful",
-        description: "Welcome back to SmartFund!",
+        description: "Welcome back to Kuberiti!",
       });
       
       navigate('/dashboard');
@@ -80,9 +80,9 @@ const Login = () => {
       
       if (error.message) {
         if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Invalid email or password. Please try again or check if your email has been confirmed.";
+          errorMessage = "Invalid email or password. Please try again.";
         } else if (error.message.includes("Email not confirmed")) {
-          errorMessage = "Please confirm your email before logging in. Check your inbox for a confirmation link.";
+          errorMessage = "Please check your email for a confirmation link.";
         } else {
           errorMessage = error.message;
         }

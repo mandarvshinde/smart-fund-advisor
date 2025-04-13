@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,7 +64,7 @@ const RegisterForm = () => {
             name: data.name,
             risk_appetite: data.riskAppetite,
           },
-          // Don't require email confirmation for a better testing experience
+          // Disable email confirmation for direct login
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
@@ -77,22 +76,11 @@ const RegisterForm = () => {
       
       console.log("Registration successful:", authData);
       
-      // Show different message based on whether email confirmation is required
-      if (!authData?.user?.email_confirmed_at) {
-        toast({
-          title: "Registration Successful",
-          description: "Your account has been created. You can now sign in with your credentials.",
-        });
-      } else {
-        toast({
-          title: "Registration Successful",
-          description: "Your account has been created and you're now signed in.",
-        });
-        
-        // If email is confirmed automatically, navigate to dashboard
-        navigate('/dashboard');
-        return;
-      }
+      // Always show success and navigate to login
+      toast({
+        title: "Registration Successful",
+        description: "Your account has been created. You can now sign in with your credentials.",
+      });
       
       // Navigate to login page after successful registration
       navigate('/login');

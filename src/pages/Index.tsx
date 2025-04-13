@@ -8,7 +8,7 @@ const Index = () => {
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   useEffect(() => {
-    document.title = 'SmartFund - Intelligent Mutual Fund Portfolio Management';
+    document.title = 'Kuberiti - Intelligent Investment Portfolio Management';
     
     // Safety timeout to prevent infinite loading
     const timer = setTimeout(() => {

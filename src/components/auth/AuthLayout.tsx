@@ -13,7 +13,7 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <Logo />
+          <Logo className="mx-auto" />
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{title}</h2>
           {subtitle && <div className="mt-2 text-sm text-gray-600">{subtitle}</div>}
         </div>

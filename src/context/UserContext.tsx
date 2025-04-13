@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { User } from '@/types';
@@ -21,18 +22,38 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  // Function to create a user profile from Supabase user
+  const createUserProfileFromAuth = (supabaseUser: SupabaseUser): User => {
+    return {
+      id: supabaseUser.id,
+      name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
+      email: supabaseUser.email || "",
+      profileImage: null,
+      riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
+      agenticAIEnabled: false,
+    };
+  };
+
   useEffect(() => {
+    console.log("UserContext initialization");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.email);
-        setSession(session);
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email);
         
-        if (session?.user) {
-          await fetchUserProfile(session.user);
+        // Update the session immediately
+        setSession(currentSession);
+        
+        // Handle user state separately
+        if (currentSession?.user) {
+          // Use setTimeout to prevent potential auth deadlocks
+          setTimeout(() => {
+            fetchUserProfile(currentSession.user);
+          }, 0);
         } else {
           setUser(null);
-          setIsLoading(false); // Make sure we set loading to false when there's no session
+          setIsLoading(false);
         }
       }
     );
@@ -40,13 +61,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // THEN check for existing session
     const initializeAuth = async () => {
       try {
-        setIsLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log("Got existing session:", session?.user?.email);
+        console.log("Checking for existing session");
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        console.log("Got existing session:", currentSession?.user?.email);
         
-        if (session?.user) {
-          await fetchUserProfile(session.user);
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
+          await fetchUserProfile(currentSession.user);
         } else {
+          console.log("No session found");
           setIsLoading(false);
         }
       } catch (error) {
@@ -79,14 +103,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (error) {
         console.error('Failed to fetch profile:', error);
         // If we can't fetch the profile, still create a user object from auth data
-        setUser({
-          id: supabaseUser.id,
-          name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
-          email: supabaseUser.email || "",
-          profileImage: null,
-          riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
-          agenticAIEnabled: false,
-        });
+        setUser(createUserProfileFromAuth(supabaseUser));
       } else if (data) {
         setUser({
           id: data.id,
@@ -99,26 +116,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } else {
         console.log("No profile found, creating from metadata");
         // Fallback to user metadata if profile doesn't exist yet
-        setUser({
-          id: supabaseUser.id,
-          name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
-          email: supabaseUser.email || "",
-          profileImage: null,
-          riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
-          agenticAIEnabled: false,
-        });
+        setUser(createUserProfileFromAuth(supabaseUser));
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
       // If we encounter an error, still create a user object from auth data
-      setUser({
-        id: supabaseUser.id,
-        name: supabaseUser.user_metadata.name || supabaseUser.email?.split('@')[0] || "User",
-        email: supabaseUser.email || "",
-        profileImage: null,
-        riskAppetite: (supabaseUser.user_metadata.risk_appetite as 'low' | 'moderate' | 'high') || 'moderate',
-        agenticAIEnabled: false,
-      });
+      setUser(createUserProfileFromAuth(supabaseUser));
       toast({
         title: 'Error',
         description: 'Failed to load user profile. Using basic profile information.',
