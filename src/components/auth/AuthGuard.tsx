@@ -38,9 +38,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   if (isLoading) {
     // Display a simple loading state while checking user session
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-finance-primary mr-3"></div>
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8D6E63] mr-3"></div>
+        <div className="text-lg text-[#5D4037]">Loading...</div>
       </div>
     );
   }

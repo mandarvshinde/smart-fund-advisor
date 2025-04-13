@@ -14,7 +14,7 @@ const Goals = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    document.title = "Financial Goals | SmartFund";
+    document.title = "Financial Goals | Keberiti";
   }, []);
 
   const { data: goals, isLoading, error } = useQuery({

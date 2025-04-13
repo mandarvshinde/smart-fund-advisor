@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -46,11 +46,12 @@ const Login = () => {
     },
   });
 
-  // Important: Always declare hooks before any conditional returns
-  // If already logged in, redirect to dashboard
-  if (user && !isLoading) {
-    return <navigate to="/dashboard" replace />;
-  }
+  // Use useEffect for redirecting after render to avoid React hooks issues
+  useEffect(() => {
+    if (user && !isLoading) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, isLoading, navigate]);
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -70,7 +71,7 @@ const Login = () => {
       console.log("Login successful, user:", authData?.user);
       toast({
         title: "Login Successful",
-        description: "Welcome back to Kuberiti!",
+        description: "Welcome back to Keberiti!",
       });
       
       navigate('/dashboard');

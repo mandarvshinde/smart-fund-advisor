@@ -12,7 +12,7 @@ const Advisor = () => {
   const { user } = useUser();
 
   useEffect(() => {
-    document.title = "AI Advisor | SmartFund";
+    document.title = "AI Advisor | Keberiti";
   }, []);
 
   return (

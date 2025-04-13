@@ -57,7 +57,7 @@ const GrowwAuthLayout = ({ children, title, subtitle }: GrowwAuthLayoutProps) =>
 
       {/* Footer */}
       <footer className="w-full py-4 px-6 text-center text-sm text-gray-500 border-t">
-        <p>© {new Date().getFullYear()} Kuberiti. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Keberiti. All rights reserved.</p>
       </footer>
     </div>
   );
