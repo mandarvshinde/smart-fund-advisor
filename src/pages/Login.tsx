@@ -108,7 +108,7 @@ const Login = () => {
       subtitle={
         <>
           Or{" "}
-          <Link to="/register" className="font-medium text-finance-primary hover:text-finance-primary/80">
+          <Link to="/register" className="font-medium text-[#8D6E63] hover:text-[#6D4C41]">
             create a new account
           </Link>
         </>
@@ -180,13 +180,17 @@ const Login = () => {
             
             <Link 
               to="/forgot-password" 
-              className="text-sm font-medium text-finance-primary hover:text-finance-primary/80"
+              className="text-sm font-medium text-[#8D6E63] hover:text-[#6D4C41]"
             >
               Forgot password?
             </Link>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting || isLoading}>
+          <Button 
+            type="submit" 
+            className="w-full bg-[#8D6E63] hover:bg-[#6D4C41]" 
+            disabled={isSubmitting || isLoading}
+          >
             <LogIn className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Signing in...' : 'Sign in'}
           </Button>

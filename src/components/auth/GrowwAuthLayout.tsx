@@ -25,7 +25,7 @@ const GrowwAuthLayout = ({ children, title, subtitle }: GrowwAuthLayoutProps) =>
           <Link to="/login">
             <Button 
               variant={isLoginPage ? "default" : "outline"} 
-              className={isLoginPage ? "bg-finance-primary text-white" : "text-finance-primary border-finance-primary hover:bg-finance-primary/10"}
+              className={isLoginPage ? "bg-[#8D6E63] text-white" : "text-[#8D6E63] border-[#8D6E63] hover:bg-[#EFEBE9]"}
             >
               Login
             </Button>
@@ -33,7 +33,7 @@ const GrowwAuthLayout = ({ children, title, subtitle }: GrowwAuthLayoutProps) =>
           <Link to="/register">
             <Button 
               variant={!isLoginPage ? "default" : "outline"}
-              className={!isLoginPage ? "bg-finance-primary text-white" : "text-finance-primary border-finance-primary hover:bg-finance-primary/10"}
+              className={!isLoginPage ? "bg-[#8D6E63] text-white" : "text-[#8D6E63] border-[#8D6E63] hover:bg-[#EFEBE9]"}
             >
               Get Started
             </Button>
@@ -45,7 +45,7 @@ const GrowwAuthLayout = ({ children, title, subtitle }: GrowwAuthLayoutProps) =>
       <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#5D4037]">{title}</h2>
             {subtitle && <div className="mt-2 text-sm text-gray-600">{subtitle}</div>}
           </div>
 
@@ -57,7 +57,7 @@ const GrowwAuthLayout = ({ children, title, subtitle }: GrowwAuthLayoutProps) =>
 
       {/* Footer */}
       <footer className="w-full py-4 px-6 text-center text-sm text-gray-500 border-t">
-        <p>© {new Date().getFullYear()} SmartFund. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Kuberiti. All rights reserved.</p>
       </footer>
     </div>
   );

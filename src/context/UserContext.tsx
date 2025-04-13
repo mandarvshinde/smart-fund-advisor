@@ -94,8 +94,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
       console.log("Fetching profile for user:", supabaseUser.id);
+      // Fix the TypeScript error by using type assertion for the profiles table
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .select('*')
         .eq('id', supabaseUser.id)
         .single();
@@ -135,8 +136,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const updateUser = async (updatedUser: User) => {
     setIsLoading(true);
     try {
+      // Fix the TypeScript error by using type assertion for the profiles table
       const { error } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update({
           name: updatedUser.name,
           profile_image: updatedUser.profileImage,

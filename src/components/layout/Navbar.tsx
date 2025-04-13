@@ -61,7 +61,7 @@ const Navbar = () => {
             <div className="hidden md:ml-6 md:flex md:space-x-2">
               <Link
                 to="/"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
                   <Home className="h-4 w-4" />
@@ -70,7 +70,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/investments"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
                   <PieChart className="h-4 w-4" />
@@ -79,7 +79,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/goals"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
                   <Target className="h-4 w-4" />
@@ -88,7 +88,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/advisor"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
                   <HelpCircle className="h-4 w-4" />
@@ -102,7 +102,7 @@ const Navbar = () => {
             <Button 
               variant="outline" 
               size="sm"
-              className="mr-2 hidden sm:flex"
+              className="mr-2 hidden sm:flex text-[#8D6E63] border-[#8D6E63] hover:bg-[#EFEBE9]"
               asChild
             >
               <Link to="/invest">Invest Now</Link>
@@ -158,7 +158,7 @@ const Navbar = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
               to="/"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63]"
               onClick={toggleMenu}
             >
               <div className="flex items-center space-x-2">
@@ -168,7 +168,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/investments"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63]"
               onClick={toggleMenu}
             >
               <div className="flex items-center space-x-2">
@@ -178,7 +178,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/goals"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63]"
               onClick={toggleMenu}
             >
               <div className="flex items-center space-x-2">
@@ -188,7 +188,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/advisor"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-finance-primary"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63]"
               onClick={toggleMenu}
             >
               <div className="flex items-center space-x-2">
@@ -198,7 +198,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/invest"
-              className="block px-3 py-2 rounded-md text-base font-medium bg-finance-primary text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium bg-[#8D6E63] text-white"
               onClick={toggleMenu}
             >
               Invest Now
