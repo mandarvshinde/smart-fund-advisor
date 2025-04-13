@@ -81,7 +81,7 @@ export const PortfolioSummary = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900">₹{metrics.totalInvested.toLocaleString()}</div>
-                <div className="text-sm text-gray-500 mt-1">Across {investments.length} investments</div>
+                <div className="text-sm text-gray-500 mt-1">Across {investments ? investments.length : 0} investments</div>
               </CardContent>
             </Card>
             

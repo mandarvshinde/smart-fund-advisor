@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -80,3 +81,6 @@ export type ChatMessage = {
   content: string;
   timestamp: string;
 };
+
+// Re-export Fund types from fundTypes.ts to maintain compatibility
+export { Fund, FundDetails } from './fundTypes';
