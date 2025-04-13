@@ -20,6 +20,9 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import Funds from "./pages/Funds";
+import Calculator from "./pages/Calculator";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,6 +47,9 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/funds" element={<Funds />} />
+            <Route path="/calculator" element={<Calculator />} />
+            <Route path="/chat" element={<Chat />} />
             
             {/* Protected routes */}
             <Route 

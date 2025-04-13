@@ -4,13 +4,14 @@ import { Link } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import Logo from '@/components/brand/Logo';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Shield, TrendingUp, Target } from 'lucide-react';
+import { ChevronRight, Shield, TrendingUp, Target, BarChart3, Calculator, MessageSquare } from 'lucide-react';
+import HeroImage from '../assets/hero-image.png';
 
 const Index = () => {
-  const { isLoading, session } = useUser();
+  const { isLoading, user } = useUser();
   
   useEffect(() => {
-    document.title = 'Kuberiti - Intelligent Investment Portfolio Management';
+    document.title = 'Keberiti - Intelligent Investment Portfolio Management';
   }, []);
 
   // Show loading indicator while auth state is being determined
@@ -29,8 +30,13 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <Logo className="h-10" />
+            <div className="hidden md:flex space-x-4 mx-auto">
+              <Link to="/funds" className="text-gray-700 font-medium hover:text-[#8D6E63]">Explore Funds</Link>
+              <Link to="/calculator" className="text-gray-700 font-medium hover:text-[#8D6E63]">Calculator</Link>
+              <Link to="/about" className="text-gray-700 font-medium hover:text-[#8D6E63]">About Us</Link>
+            </div>
             <div className="flex space-x-4">
-              {session ? (
+              {user ? (
                 <Button asChild className="bg-[#8D6E63] hover:bg-[#6D4C41] text-white">
                   <Link to="/dashboard">Go to Dashboard</Link>
                 </Button>
@@ -58,25 +64,28 @@ const Index = () => {
                 Smart Investment Solutions for Your Future
               </h1>
               <p className="mt-6 text-lg text-gray-700">
-                Kuberiti helps you build and manage an intelligent investment portfolio 
+                Keberiti helps you build and manage an intelligent investment portfolio 
                 tailored to your financial goals and risk appetite.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="bg-[#8D6E63] hover:bg-[#6D4C41] text-white">
-                  <Link to="/register">
-                    Start Investing
+                  <Link to="/funds">
+                    Explore Funds
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="text-[#8D6E63] border-[#8D6E63] hover:bg-[#EFEBE9]">
-                  <Link to="/login">Login to Your Account</Link>
+                  <Link to="/calculator">
+                    <Calculator className="mr-2 h-5 w-5" />
+                    Investment Calculator
+                  </Link>
                 </Button>
               </div>
             </div>
             <div className="hidden lg:block">
               <img
                 src="/lovable-uploads/51289d21-30ea-4bc6-bc74-ca4b8c933683.png"
-                alt="Kuberiti Investment"
+                alt="Keberiti Investment"
                 className="w-full max-w-md mx-auto"
               />
             </div>
@@ -88,7 +97,7 @@ const Index = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#5D4037]">Why Choose Kuberiti</h2>
+            <h2 className="text-3xl font-bold text-[#5D4037]">Why Choose Keberiti</h2>
             <p className="mt-4 text-lg text-gray-600">
               Intelligent investment solutions designed for your financial growth
             </p>
@@ -133,11 +142,19 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Start Your Investment Journey?</h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of investors who trust Kuberiti for their financial growth and wealth management.
+            Join thousands of investors who trust Keberiti for their financial growth and wealth management.
           </p>
-          <Button asChild size="lg" className="bg-white text-[#5D4037] hover:bg-gray-100">
-            <Link to="/register">Create Your Account Today</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button asChild size="lg" className="bg-white text-[#5D4037] hover:bg-gray-100">
+              <Link to="/register">Create Your Account Today</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Link to="/chat">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Chat with Us
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
