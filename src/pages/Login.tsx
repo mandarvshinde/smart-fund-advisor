@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,11 +37,6 @@ const Login = () => {
   const { user, isLoading } = useUser();
   const navigate = useNavigate();
   
-  // If already logged in, redirect to dashboard
-  if (user && !isLoading) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -50,6 +45,12 @@ const Login = () => {
       rememberMe: false,
     },
   });
+
+  // Important: Always declare hooks before any conditional returns
+  // If already logged in, redirect to dashboard
+  if (user && !isLoading) {
+    return <navigate to="/dashboard" replace />;
+  }
 
   const onSubmit = async (data: LoginFormValues) => {
     try {

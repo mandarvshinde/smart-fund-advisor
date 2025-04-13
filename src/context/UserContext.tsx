@@ -94,9 +94,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
       console.log("Fetching profile for user:", supabaseUser.id);
-      // Fix the TypeScript error by using type assertion for the profiles table
+      // Use proper type annotations for Supabase queries
       const { data, error } = await supabase
-        .from('profiles' as any)
+        .from('profiles')
         .select('*')
         .eq('id', supabaseUser.id)
         .single();
@@ -106,6 +106,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // If we can't fetch the profile, still create a user object from auth data
         setUser(createUserProfileFromAuth(supabaseUser));
       } else if (data) {
+        // Safely cast the data object
         setUser({
           id: data.id,
           name: data.name || supabaseUser.user_metadata.name || "User",
@@ -136,9 +137,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const updateUser = async (updatedUser: User) => {
     setIsLoading(true);
     try {
-      // Fix the TypeScript error by using type assertion for the profiles table
       const { error } = await supabase
-        .from('profiles' as any)
+        .from('profiles')
         .update({
           name: updatedUser.name,
           profile_image: updatedUser.profileImage,
