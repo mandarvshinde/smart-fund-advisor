@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import Logo from '@/components/brand/Logo';
@@ -14,7 +13,6 @@ const Index = () => {
     document.title = 'Kuberiti - Intelligent Investment Portfolio Management';
   }, []);
 
-  // Show loading indicator while auth state is being determined
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -29,7 +27,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header/Navigation */}
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
@@ -59,7 +56,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -122,70 +118,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#5D4037]">More About Kuberiti</h2>
+            <h2 className="text-3xl font-bold text-[#5D4037]">Our Services</h2>
           </div>
           
           <div className="space-y-8">
             <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-[#5D4037] mb-3">Expert Guidance at Your Fingertips</h3>
-              <p className="text-gray-700">
-                Kuberiti connects you with financial experts who provide personalized recommendations, portfolio reviews, and investment planning. Simply send us a WhatsApp message and our experts will guide you through your investment journey.
-              </p>
-            </div>
-            
-            <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-[#5D4037] mb-3">100% Safe Transactions</h3>
-              <p className="text-gray-700">
-                We've integrated with Bombay Stock Exchange to process your transactions securely. Your money goes directly from you to BSE and then to the mutual fund company, completely bypassing Kuberiti's accounts for maximum security and transparency.
-              </p>
-            </div>
-            
-            <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-[#5D4037] mb-3">No Hidden Fees</h3>
-              <p className="text-gray-700">
-                With Kuberiti, you invest in Regular Mutual Funds. The mutual fund companies pay us a small commission, which means there are absolutely no extra fees or hidden charges for you. We prioritize transparency in all our operations.
-              </p>
-            </div>
-          </div>
-          
-          <div className="mt-12 text-center">
-            <h3 className="text-xl font-semibold text-[#5D4037] mb-6">Learn More About Our Services</h3>
-            <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm max-w-3xl mx-auto">
-              <h4 className="text-lg font-medium text-[#5D4037] mb-3">Get Expert Help Now</h4>
-              <p className="mb-4">
-                Ready to start your investment journey? Our financial experts are just a message away. Connect with us on WhatsApp and get personalized guidance for your mutual fund investments.
-              </p>
-              
-              <div className="bg-white p-4 rounded-lg mb-6">
-                <h5 className="font-medium mb-2">What our experts can help you with:</h5>
-                <ul className="space-y-2 text-left">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Personalized fund recommendations</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Portfolio reviews and optimization</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>SIP planning and management</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Goal-based investment strategies</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Tax-efficient investment advice</span>
-                  </li>
-                </ul>
-              </div>
-              
               <Button onClick={handleWhatsAppChat} size="lg" className="bg-green-600 hover:bg-green-700 w-full">
                 <MessageSquare className="mr-2 h-5 w-5" />
                 Chat with an Expert on WhatsApp
@@ -194,8 +134,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
-      {/* "Connect with an expert" Section - Updated */}
+
       <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -255,7 +194,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6 text-[#5D4037]">What Our Users Say</h2>
@@ -278,7 +216,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Contact Features Section */}
       <section className="py-16 bg-[#EFEBE9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8 text-center text-[#5D4037]">Contact Us</h2>
@@ -318,8 +255,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer is in PageLayout now */}
     </div>
   );
 };
