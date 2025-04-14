@@ -3,14 +3,14 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers, LayoutList, ArrowUpDown } from "lucide-react";
+import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers, LayoutList, ArrowUpDown, Carousel } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
-import { MutualFund } from "@/types";
+import { Fund } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMutualFunds } from "@/services/mockData";
 import { 
-  Carousel,
+  Carousel as CarouselComponent,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -39,42 +39,44 @@ const fundCategories = [
     id: "high-return",
     label: "High Return",
     icon: <TrendingUp className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.oneYearReturn > 15
+    filter: (fund: Fund) => fund.returns && fund.returns.oneYear > 15
   },
   {
     id: "tax-saving",
     label: "Tax Saving",
     icon: <FileText className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.subcategory.includes("Tax")
+    filter: (fund: Fund) => fund.category === 'elss' || (fund.subcategory && fund.subcategory.includes("Tax"))
   },
   {
     id: "large-cap",
     label: "Large Cap",
     icon: <Building className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.subcategory.includes("Large Cap")
+    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Large Cap"))
   },
   {
     id: "small-cap",
     label: "Small Cap",
     icon: <Diamond className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.subcategory.includes("Small Cap")
+    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Small Cap"))
   },
   {
     id: "mid-cap",
     label: "Mid Cap",
     icon: <Package className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.subcategory.includes("Mid Cap")
+    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Mid Cap"))
   },
   {
     id: "multi-asset",
     label: "Multi Asset",
     icon: <Layers className="h-4 w-4" />,
-    filter: (fund: MutualFund) => fund.subcategory.includes("Dynamic") || fund.category === "Hybrid"
+    filter: (fund: Fund) => fund.category === 'hybrid' || (fund.subcategory && fund.subcategory.includes("Dynamic"))
   }
 ];
 
 // Component for individual fund card
-const FundCard = ({ fund }: { fund: MutualFund }) => {
+const FundCard = ({ fund }: { fund: Fund }) => {
+  const oneYearReturn = fund.returns?.oneYear || 0;
+  
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardContent className="p-4">
@@ -83,13 +85,13 @@ const FundCard = ({ fund }: { fund: MutualFund }) => {
         <div className="flex justify-between items-center mt-1">
           <div>
             <p className="text-xs text-gray-500">1Y Returns</p>
-            <p className={`text-sm font-semibold ${fund.oneYearReturn > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {fund.oneYearReturn.toFixed(2)}%
+            <p className={`text-sm font-semibold ${oneYearReturn > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {oneYearReturn.toFixed(2)}%
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500">NAV</p>
-            <p className="text-sm font-semibold">₹{fund.nav.toFixed(2)}</p>
+            <p className="text-sm font-semibold">₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '0.00'}</p>
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link to={`/invest?fund=${fund.id}`}>
@@ -112,10 +114,10 @@ export const PopularFunds = () => {
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof MutualFund | null;
+    key: keyof Fund | null;
     direction: "asc" | "desc";
   }>({
-    key: "oneYearReturn",
+    key: "returns",
     direction: "desc",
   });
 
@@ -136,6 +138,11 @@ export const PopularFunds = () => {
     const sorted = [...filteredFunds];
     if (sortConfig.key) {
       sorted.sort((a, b) => {
+        if (sortConfig.key === "returns") {
+          const aReturn = a.returns?.oneYear || 0;
+          const bReturn = b.returns?.oneYear || 0;
+          return sortConfig.direction === "asc" ? aReturn - bReturn : bReturn - aReturn;
+        }
         if (a[sortConfig.key!] < b[sortConfig.key!]) {
           return sortConfig.direction === "asc" ? -1 : 1;
         }
@@ -161,14 +168,14 @@ export const PopularFunds = () => {
 
   const totalPages = Math.ceil(sortedFunds.length / ITEMS_PER_PAGE);
 
-  const handleSort = (key: keyof MutualFund) => {
+  const handleSort = (key: keyof Fund) => {
     setSortConfig(prevConfig => ({
       key,
       direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
     }));
   };
 
-  const getSortIcon = (key: keyof MutualFund) => {
+  const getSortIcon = (key: keyof Fund) => {
     if (sortConfig.key !== key) {
       return <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />;
     }
@@ -254,7 +261,7 @@ export const PopularFunds = () => {
               </div>
             ) : viewMode === "cards" ? (
               <div className="relative">
-                <Carousel
+                <CarouselComponent
                   opts={{
                     align: "start",
                     loop: false,
@@ -272,7 +279,7 @@ export const PopularFunds = () => {
                     <CarouselPrevious className="-left-6" />
                     <CarouselNext className="-right-6" />
                   </div>
-                </Carousel>
+                </CarouselComponent>
               </div>
             ) : (
               <div className="relative">
@@ -295,30 +302,16 @@ export const PopularFunds = () => {
                             variant="ghost" 
                             size="sm" 
                             className="font-medium p-0 h-auto" 
-                            onClick={() => handleSort("oneYearReturn")}
+                            onClick={() => handleSort("returns")}
                           >
-                            1Y Return {getSortIcon("oneYearReturn")}
+                            1Y Return {getSortIcon("returns")}
                           </Button>
                         </TableHead>
                         <TableHead className="w-[120px]">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="font-medium p-0 h-auto" 
-                            onClick={() => handleSort("threeYearReturn")}
-                          >
-                            3Y Return {getSortIcon("threeYearReturn")}
-                          </Button>
+                          <span className="font-medium">3Y Return</span>
                         </TableHead>
                         <TableHead className="w-[120px]">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="font-medium p-0 h-auto" 
-                            onClick={() => handleSort("fiveYearReturn")}
-                          >
-                            5Y Return {getSortIcon("fiveYearReturn")}
-                          </Button>
+                          <span className="font-medium">5Y Return</span>
                         </TableHead>
                         <TableHead className="w-[100px]">
                           <span className="font-medium">NAV</span>
@@ -332,19 +325,19 @@ export const PopularFunds = () => {
                           <TableCell className="font-medium">
                             <div>
                               <div className="truncate max-w-[220px]">{fund.name}</div>
-                              <div className="text-xs text-gray-500">{fund.fundHouse}</div>
+                              <div className="text-xs text-gray-500">{fund.fundHouse || fund.name.split(' ')[0]}</div>
                             </div>
                           </TableCell>
-                          <TableCell className={`${fund.oneYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                            {fund.oneYearReturn.toFixed(2)}%
+                          <TableCell className={`${fund.returns?.oneYear && fund.returns.oneYear > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.returns?.oneYear ? fund.returns.oneYear.toFixed(2) : '0.00'}%
                           </TableCell>
-                          <TableCell className={`${fund.threeYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                            {fund.threeYearReturn.toFixed(2)}%
+                          <TableCell className={`${fund.returns?.threeYear && fund.returns.threeYear > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.returns?.threeYear ? fund.returns.threeYear.toFixed(2) : '0.00'}%
                           </TableCell>
-                          <TableCell className={`${fund.fiveYearReturn > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                            {fund.fiveYearReturn.toFixed(2)}%
+                          <TableCell className={`${fund.returns?.fiveYear && fund.returns.fiveYear > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                            {fund.returns?.fiveYear ? fund.returns.fiveYear.toFixed(2) : '0.00'}%
                           </TableCell>
-                          <TableCell>₹{fund.nav.toFixed(2)}</TableCell>
+                          <TableCell>₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '0.00'}</TableCell>
                           <TableCell className="text-right">
                             <Button variant="outline" size="sm" asChild>
                               <Link to={`/invest?fund=${fund.id}`}>
@@ -395,3 +388,5 @@ export const PopularFunds = () => {
     </div>
   );
 };
+
+export default PopularFunds;

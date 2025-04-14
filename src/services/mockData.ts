@@ -1,4 +1,5 @@
-import { Fund, FundCategory, Recommendation, Goal, InvestmentHistoryItem } from '@/types';
+
+import { Fund, Recommendation, Goal } from '@/types';
 
 // Utility function to generate a random number within a range
 const getRandomNumber = (min: number, max: number): number => {
@@ -29,8 +30,8 @@ const generateFundName = (): string => {
 };
 
 // Function to generate a random fund category
-const generateRandomCategory = (): FundCategory => {
-  const categories: FundCategory[] = ['equity', 'debt', 'hybrid', 'index', 'elss'];
+const generateRandomCategory = (): string => {
+  const categories: string[] = ['equity', 'debt', 'hybrid', 'index', 'elss'];
   return categories[Math.floor(Math.random() * categories.length)];
 };
 
@@ -45,7 +46,11 @@ const generateRandomFund = (id: string): Fund => {
     name,
     category,
     price,
-    returns: parseFloat((Math.random() * 20).toFixed(2)), // Example: returns as a percentage
+    returns: {
+      oneYear: parseFloat((Math.random() * 20).toFixed(2)),
+      threeYear: parseFloat((Math.random() * 25).toFixed(2)),
+      fiveYear: parseFloat((Math.random() * 30).toFixed(2))
+    },
     rating: getRandomInteger(1, 5),
     volatility: parseFloat((Math.random() * 5).toFixed(2)),
     expenseRatio: parseFloat((Math.random() * 2).toFixed(2)),
@@ -62,9 +67,17 @@ export const generateRandomFunds = (count: number): Fund[] => {
   return funds;
 };
 
+// Create a mock set of mutual funds for the application
+export const mockFunds = generateRandomFunds(20);
+
 // Function to filter funds by category
-export const filterFundsByCategory = (funds: Fund[], category: FundCategory): Fund[] => {
+export const filterFundsByCategory = (funds: Fund[], category: string): Fund[] => {
   return funds.filter(fund => fund.category === category);
+};
+
+// Function to fetch mutual funds - this was missing
+export const fetchMutualFunds = (): Fund[] => {
+  return mockFunds;
 };
 
 // Recommendations
@@ -76,13 +89,19 @@ export const fetchRecommendations = (): Recommendation[] => {
       description: 'Increase exposure to mid-cap equity',
       reason: 'Current portfolio is underweight in mid-cap which has growth potential',
       isActioned: false,
+      potentialBenefit: '12-15% annual returns',
+      riskLevel: 'moderate',
+      date: '2025-04-10'
     },
     {
       id: '2',
-      type: 'rebalance',
+      type: 'switch',
       description: 'Rebalance fixed income allocation',
       reason: 'Interest rate changes have created opportunities in corporate bonds',
       isActioned: false,
+      potentialBenefit: '8-10% annual returns',
+      riskLevel: 'low',
+      date: '2025-04-12'
     },
     {
       id: '3',
@@ -90,6 +109,9 @@ export const fetchRecommendations = (): Recommendation[] => {
       description: 'Reduce exposure to thematic funds',
       reason: 'Current allocation exceeds recommended portfolio percentage',
       isActioned: true,
+      potentialBenefit: 'Risk reduction',
+      riskLevel: 'high',
+      date: '2025-04-05'
     },
   ];
   
@@ -102,6 +124,18 @@ export const actOnRecommendation = (id: string): void => {
 };
 
 // Investment data
+export interface InvestmentHistoryItem {
+  id: string;
+  fundName: string;
+  type: string;
+  amount: number;
+  units: number;
+  currentValue: number;
+  sipAmount: number;
+  lastTransactionDate: Date;
+  returns: number;
+}
+
 export const fetchInvestments = (): InvestmentHistoryItem[] => {
   const investments: InvestmentHistoryItem[] = [
     {
@@ -160,7 +194,7 @@ export const fetchGoals = (): Goal[] => {
       id: '1',
       name: 'Child Education',
       targetAmount: 2000000,
-      targetDate: new Date('2035-07-01'),
+      targetDate: '2035-07-01',
       currentAmount: 450000,
       monthlyContribution: 7500,
       linkedFunds: ['HDFC Index Fund', 'Axis Long Term Equity Fund'],
@@ -170,7 +204,7 @@ export const fetchGoals = (): Goal[] => {
       id: '2',
       name: 'Retirement',
       targetAmount: 10000000,
-      targetDate: new Date('2045-01-01'),
+      targetDate: '2045-01-01',
       currentAmount: 1200000,
       monthlyContribution: 15000,
       linkedFunds: ['SBI Corporate Bond Fund', 'ICICI Prudential Bluechip Fund', 'Kotak Emerging Equity Fund'],
@@ -180,7 +214,7 @@ export const fetchGoals = (): Goal[] => {
       id: '3',
       name: 'Home Purchase',
       targetAmount: 5000000,
-      targetDate: new Date('2028-10-01'),
+      targetDate: '2028-10-01',
       currentAmount: 1800000,
       monthlyContribution: 25000,
       linkedFunds: ['SBI Corporate Bond Fund', 'Kotak Emerging Equity Fund'],
@@ -190,7 +224,7 @@ export const fetchGoals = (): Goal[] => {
       id: '4',
       name: 'Travel',
       targetAmount: 500000,
-      targetDate: new Date('2026-05-01'),
+      targetDate: '2026-05-01',
       currentAmount: 120000,
       monthlyContribution: 8000,
       linkedFunds: ['HDFC Money Market Fund'],
@@ -210,19 +244,61 @@ export const getGoalById = (id: string): Goal | undefined => {
 export const fetchPopularFunds = (): Fund[] => {
   // Generate 5 random funds for popular funds
   const popularFunds: Fund[] = [];
-    for (let i = 0; i < 5; i++) {
-        popularFunds.push(generateRandomFund(String(i + 1)));
-    }
+  for (let i = 0; i < 5; i++) {
+    popularFunds.push(generateRandomFund(String(i + 1)));
+  }
   return popularFunds;
 };
 
 // Market insights
-export const fetchMarketInsights = (): string[] => {
-  const insights: string[] = [
-    'RBI keeps repo rate unchanged at 6.5%',
-    'Crude oil prices surge amid supply concerns',
-    'US Fed signals potential rate cuts in 2024',
-    'Indian economy expected to grow at 7% in FY25',
+export interface MarketInsight {
+  id: string;
+  title: string;
+  description: string;
+  impact: 'positive' | 'negative' | 'neutral';
+  category: string;
+  date: string;
+  source: string;
+}
+
+export const fetchMarketInsights = (): MarketInsight[] => {
+  const insights: MarketInsight[] = [
+    {
+      id: '1',
+      title: 'RBI keeps repo rate unchanged at 6.5%',
+      description: 'The Reserve Bank of India maintained its key interest rate at 6.5% for the sixth consecutive time.',
+      impact: 'neutral',
+      category: 'monetary policy',
+      date: '2025-04-05',
+      source: 'Economic Times'
+    },
+    {
+      id: '2',
+      title: 'Crude oil prices surge amid supply concerns',
+      description: 'Global crude oil prices rose by 3% due to supply disruptions in the Middle East.',
+      impact: 'negative',
+      category: 'commodities',
+      date: '2025-04-08',
+      source: 'Bloomberg'
+    },
+    {
+      id: '3',
+      title: 'US Fed signals potential rate cuts in 2024',
+      description: 'The Federal Reserve hinted at possible interest rate reductions later this year.',
+      impact: 'positive',
+      category: 'global markets',
+      date: '2025-04-10',
+      source: 'Wall Street Journal'
+    },
+    {
+      id: '4',
+      title: 'Indian economy expected to grow at 7% in FY25',
+      description: 'Economic forecasts predict robust growth for the Indian economy in the coming fiscal year.',
+      impact: 'positive',
+      category: 'economy',
+      date: '2025-04-12',
+      source: 'Financial Express'
+    },
   ];
   return insights;
 };

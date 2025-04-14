@@ -1,124 +1,100 @@
 
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { Calendar, TrendingDown, TrendingUp, Minus, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMarketInsights } from "@/services/mockData";
+import { fetchMarketInsights, MarketInsight } from "@/services/mockData";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export const MarketInsights = () => {
-  const { data: insights, isLoading } = useQuery({
+  const { data: insights = [], isLoading } = useQuery({
     queryKey: ['marketInsights'],
     queryFn: fetchMarketInsights,
   });
 
-  const getImpactIcon = (impact: string) => {
+  // Helper function to render impact icon
+  const renderImpactIcon = (impact: 'positive' | 'negative' | 'neutral') => {
     switch (impact) {
       case 'positive':
-        return <TrendingUp className="h-5 w-5 text-finance-success" />;
+        return <TrendingUp className="h-4 w-4 text-green-500" />;
       case 'negative':
-        return <TrendingDown className="h-5 w-5 text-finance-danger" />;
+        return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-finance-warning" />;
+        return <Minus className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  const getImpactBadge = (impact: string) => {
+  // Helper function to get impact color
+  const getImpactColor = (impact: 'positive' | 'negative' | 'neutral') => {
     switch (impact) {
       case 'positive':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Positive</Badge>;
+        return "bg-green-100 text-green-800";
       case 'negative':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Negative</Badge>;
+        return "bg-red-100 text-red-800";
       default:
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Neutral</Badge>;
-    }
-  };
-
-  const getCategoryBadge = (category: string) => {
-    switch (category) {
-      case 'market':
-        return <Badge variant="outline">Market</Badge>;
-      case 'economy':
-        return <Badge variant="outline">Economy</Badge>;
-      case 'stock':
-        return <Badge variant="outline">Stock</Badge>;
-      case 'sector':
-        return <Badge variant="outline">Sector</Badge>;
-      case 'policy':
-        return <Badge variant="outline">Policy</Badge>;
-      default:
-        return <Badge variant="outline">Other</Badge>;
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Market Insights</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2].map((i) => (
-            <Card key={i} className="shadow-sm">
-              <CardHeader className="pb-2">
-                <div className="h-5 w-36 bg-gray-200 rounded animate-pulse"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-20 w-full bg-gray-200 rounded animate-pulse"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!insights || insights.length === 0) {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Market Insights</h2>
-        <Card className="shadow-sm">
-          <CardContent className="pt-6 text-center">
-            <AlertCircle className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-            <p className="text-lg font-medium">No market insights available</p>
-            <p className="text-gray-500 mt-1">Check back later for updates on market trends and news.</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Market Insights</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Market Insights</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {insights.map((insight) => (
-          <Card key={insight.id} className="shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between">
-                <div className="flex items-start">
-                  {getImpactIcon(insight.impact)}
-                  <CardTitle className="text-base font-semibold text-gray-900 ml-2">
-                    {insight.title}
-                  </CardTitle>
-                </div>
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg">Market Insights</CardTitle>
+          <Button variant="ghost" size="sm" className="text-sm text-muted-foreground h-8">
+            View All <ExternalLink className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {insights.map((insight: MarketInsight) => (
+          <div key={insight.id} className="space-y-2">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-2">
+                {renderImpactIcon(insight.impact)}
+                <h4 className="text-sm font-medium leading-none">{insight.title}</h4>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-700 mb-3">{insight.description}</p>
-              
-              <div className="flex justify-between items-center">
-                <div className="flex space-x-2">
-                  {getImpactBadge(insight.impact)}
-                  {getCategoryBadge(insight.category)}
-                </div>
-                
-                <div className="text-xs text-gray-500">
-                  {new Date(insight.date).toLocaleDateString()} • {insight.source}
-                </div>
+              <Badge variant="secondary" className={`text-xs ${getImpactColor(insight.impact)}`}>
+                {insight.impact.charAt(0).toUpperCase() + insight.impact.slice(1)}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground pl-6">{insight.description}</p>
+            <div className="flex items-center justify-between pl-6">
+              <div className="flex items-center space-x-1">
+                <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200">
+                  {insight.category}
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span>{insight.date} • {insight.source}</span>
+              </div>
+            </div>
+            <Separator className="mt-3" />
+          </div>
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
+
+export default MarketInsights;

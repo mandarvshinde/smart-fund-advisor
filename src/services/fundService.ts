@@ -1,6 +1,6 @@
 
 import { Fund, FundDetails } from '@/types';
-import { mockFunds } from './mockData';
+import { fetchMutualFunds } from './mockData';
 
 // In a real app, we would fetch this data from mfapi.com
 // For demo purposes, we're using mock data and simulating API calls
@@ -8,6 +8,9 @@ import { mockFunds } from './mockData';
 export const fetchFundsList = async (category: string, sortBy: string): Promise<Fund[]> => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Get funds from mockData
+  const mockFunds = fetchMutualFunds();
   
   // Filter by category if needed
   let filteredFunds = [...mockFunds];
@@ -24,7 +27,8 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
   await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Find the fund in our mock data
-  const fund = mockFunds.find(f => f.schemeCode === schemeCode);
+  const mockFunds = fetchMutualFunds();
+  const fund = mockFunds.find(f => f.id === schemeCode);
   
   if (!fund) return null;
   
@@ -37,8 +41,8 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
     launchDate: '12-06-2010',
     fundManager: 'Experienced Fund Manager',
     exitLoad: '1% if redeemed within 1 year',
-    returns: {
-      oneYear: fund.returns?.oneYear || (Math.random() * 30 - 5),
+    returns: fund.returns || {
+      oneYear: (Math.random() * 30 - 5),
       threeYear: (Math.random() * 40 + 5),
       fiveYear: (Math.random() * 60 + 10),
     },
@@ -68,11 +72,11 @@ const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {
     case 'returns-asc':
       return sortedFunds.sort((a, b) => (a.returns?.oneYear || 0) - (b.returns?.oneYear || 0));
     case 'nav':
-      return sortedFunds.sort((a, b) => parseFloat(b.nav) - parseFloat(a.nav));
+      return sortedFunds.sort((a, b) => (b.price || 0) - (a.price || 0));
     case 'nav-asc':
-      return sortedFunds.sort((a, b) => parseFloat(a.nav) - parseFloat(b.nav));
+      return sortedFunds.sort((a, b) => (a.price || 0) - (b.price || 0));
     case 'alpha':
-      return sortedFunds.sort((a, b) => a.schemeName.localeCompare(b.schemeName));
+      return sortedFunds.sort((a, b) => a.name.localeCompare(b.name));
     default:
       return sortedFunds;
   }

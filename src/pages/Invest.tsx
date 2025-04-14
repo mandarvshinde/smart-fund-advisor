@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { Calendar, CreditCard, Landmark, TrendingUp } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchMutualFunds } from "@/services/mockData";
 import { useQuery } from "@tanstack/react-query";
+import { Fund } from "@/types";
 
 const Invest = () => {
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
@@ -22,18 +22,20 @@ const Invest = () => {
     document.title = "Invest | SmartFund";
   }, []);
 
-  const { data: mutualFunds, isLoading } = useQuery({
+  const { data: mutualFunds = [], isLoading } = useQuery({
     queryKey: ['mutualFunds'],
     queryFn: fetchMutualFunds,
   });
 
   // Get unique fund houses
   const fundHouses = mutualFunds ? 
-    [...new Set(mutualFunds.map(fund => fund.fundHouse))] : [];
+    [...new Set(mutualFunds.map((fund: Fund) => fund.fundHouse || fund.name.split(' ')[0]))] : [];
 
   // Get schemes for selected fund house
   const fundSchemes = mutualFunds ? 
-    mutualFunds.filter(fund => fund.fundHouse === fundHouse) : [];
+    mutualFunds.filter((fund: Fund) => 
+      (fund.fundHouse || fund.name.split(' ')[0]) === fundHouse
+    ) : [];
 
   const handleInvest = () => {
     if (!investmentAmount || isNaN(Number(investmentAmount)) || Number(investmentAmount) <= 0) {
@@ -54,7 +56,7 @@ const Invest = () => {
       return;
     }
 
-    const selectedScheme = mutualFunds?.find(fund => fund.id === selectedFund);
+    const selectedScheme = mutualFunds?.find((fund: Fund) => fund.id === selectedFund);
 
     toast({
       title: "Investment initiated",
@@ -91,7 +93,7 @@ const Invest = () => {
                       {isLoading ? (
                         <SelectItem value="loading" disabled>Loading...</SelectItem>
                       ) : (
-                        fundHouses.map((house) => (
+                        fundHouses.map((house: string) => (
                           <SelectItem key={house} value={house}>{house}</SelectItem>
                         ))
                       )}
@@ -111,9 +113,9 @@ const Invest = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {fundHouse ? (
-                        fundSchemes.map((scheme) => (
+                        fundSchemes.map((scheme: Fund) => (
                           <SelectItem key={scheme.id} value={scheme.id}>
-                            {scheme.name} ({scheme.subcategory})
+                            {scheme.name} ({scheme.subcategory || scheme.category})
                           </SelectItem>
                         ))
                       ) : (
@@ -157,7 +159,7 @@ const Invest = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {(() => {
-                      const fund = mutualFunds.find(f => f.id === selectedFund);
+                      const fund = mutualFunds.find((f: Fund) => f.id === selectedFund);
                       if (!fund) return null;
                       
                       return (
@@ -168,27 +170,27 @@ const Invest = () => {
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">Category</span>
-                            <span>{fund.category} - {fund.subcategory}</span>
+                            <span>{fund.category} {fund.subcategory ? `- ${fund.subcategory}` : ''}</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">NAV</span>
-                            <span>₹{fund.nav.toFixed(2)}</span>
+                            <span>₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '-'}</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">1Y Return</span>
-                            <span className="text-green-600">{fund.oneYearReturn}%</span>
+                            <span className="text-green-600">{fund.returns?.oneYear || 0}%</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">3Y Return</span>
-                            <span className="text-green-600">{fund.threeYearReturn}%</span>
+                            <span className="text-green-600">{fund.returns?.threeYear || 0}%</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">Risk Level</span>
-                            <span>{fund.riskLevel.charAt(0).toUpperCase() + fund.riskLevel.slice(1)}</span>
+                            <span>{fund.riskLevel ? (fund.riskLevel.charAt(0).toUpperCase() + fund.riskLevel.slice(1)) : 'Moderate'}</span>
                           </div>
                           <div className="flex justify-between pb-2">
                             <span className="font-medium">Expense Ratio</span>
-                            <span>{fund.expenseRatio}%</span>
+                            <span>{fund.expenseRatio || 1.2}%</span>
                           </div>
                         </>
                       );
@@ -240,7 +242,7 @@ const Invest = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="sip">
+        <TabsContent value="sip" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -258,7 +260,7 @@ const Invest = () => {
                       {isLoading ? (
                         <SelectItem value="loading" disabled>Loading...</SelectItem>
                       ) : (
-                        fundHouses.map((house) => (
+                        fundHouses.map((house: string) => (
                           <SelectItem key={house} value={house}>{house}</SelectItem>
                         ))
                       )}
@@ -278,9 +280,9 @@ const Invest = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {fundHouse ? (
-                        fundSchemes.map((scheme) => (
+                        fundSchemes.map((scheme: Fund) => (
                           <SelectItem key={scheme.id} value={scheme.id}>
-                            {scheme.name} ({scheme.subcategory})
+                            {scheme.name} ({scheme.subcategory || scheme.category})
                           </SelectItem>
                         ))
                       ) : (
@@ -324,7 +326,7 @@ const Invest = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {(() => {
-                      const fund = mutualFunds.find(f => f.id === selectedFund);
+                      const fund = mutualFunds.find((f: Fund) => f.id === selectedFund);
                       if (!fund) return null;
                       
                       return (
@@ -335,23 +337,23 @@ const Invest = () => {
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">Category</span>
-                            <span>{fund.category} - {fund.subcategory}</span>
+                            <span>{fund.category} {fund.subcategory ? `- ${fund.subcategory}` : ''}</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">NAV</span>
-                            <span>₹{fund.nav.toFixed(2)}</span>
+                            <span>₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '-'}</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">3Y Return</span>
-                            <span className="text-green-600">{fund.threeYearReturn}%</span>
+                            <span className="text-green-600">{fund.returns?.threeYear || 0}%</span>
                           </div>
                           <div className="flex justify-between border-b pb-2">
                             <span className="font-medium">Risk Level</span>
-                            <span>{fund.riskLevel.charAt(0).toUpperCase() + fund.riskLevel.slice(1)}</span>
+                            <span>{fund.riskLevel ? (fund.riskLevel.charAt(0).toUpperCase() + fund.riskLevel.slice(1)) : 'Moderate'}</span>
                           </div>
                           <div className="flex justify-between pb-2">
                             <span className="font-medium">Expense Ratio</span>
-                            <span>{fund.expenseRatio}%</span>
+                            <span>{fund.expenseRatio || 1.2}%</span>
                           </div>
                         </>
                       );
