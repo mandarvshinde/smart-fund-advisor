@@ -1,4 +1,3 @@
-
 import { MutualFund, Investment, Goal, Recommendation, MarketInsight, Fund } from '@/types';
 
 // Mock data for mutual funds
@@ -465,4 +464,16 @@ export const fetchMarketData = async (): Promise<typeof mockMarketData> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 700));
   return mockMarketData;
+};
+
+// Add the missing function for recommendations
+export const actOnRecommendation = (id: string) => {
+  console.log(`Action taken on recommendation: ${id}`);
+  return true;
+};
+
+// Add the missing function for goal details
+export const fetchGoalById = (id: string) => {
+  const goals = fetchGoals();
+  return goals.find(goal => goal.id === id);
 };

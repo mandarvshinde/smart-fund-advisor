@@ -8,7 +8,7 @@ import { MessageSquare, Mail, ArrowLeft, Linkedin } from 'lucide-react';
 
 const Chat = () => {
   useEffect(() => {
-    document.title = "Chat with Us | Keberiti";
+    document.title = "Chat with Us | Kuberiti";
     
     // Automatically redirect to WhatsApp after a short delay
     const timer = setTimeout(() => {
@@ -59,7 +59,7 @@ const Chat = () => {
                 <div className="flex items-center">
                   <Linkedin className="h-5 w-5 mr-2 text-[#8D6E63]" />
                   <a 
-                    href="https://www.linkedin.com/company/keberiti-financial-services" 
+                    href="https://www.linkedin.com/company/kuberiti-financial-services" 
                     target="_blank" 
                     rel="noreferrer"
                     className="text-blue-600 hover:underline"

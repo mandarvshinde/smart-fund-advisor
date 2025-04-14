@@ -47,7 +47,7 @@ const About = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    document.title = 'About Us | Keberiti';
+    document.title = 'About Us | Kuberiti';
   }, []);
   
   const form = useForm<FormValues>({
@@ -92,7 +92,7 @@ const About = () => {
   return (
     <PageLayout 
       title="About Us" 
-      subtitle="Learn more about Keberiti Financial Services"
+      subtitle="Learn more about Kuberiti Financial Services"
     >
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-5">
         <div className="lg:col-span-3 space-y-6">
@@ -103,7 +103,7 @@ const About = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                At Keberiti Financial Services, we believe that everyone deserves access to quality financial 
+                At Kuberiti Financial Services, we believe that everyone deserves access to quality financial 
                 advice and investment opportunities. Founded with a mission to simplify wealth creation, 
                 we've been helping individuals achieve their financial goals through customized investment solutions.
               </p>
@@ -164,12 +164,12 @@ const About = () => {
               <div className="flex items-center">
                 <Linkedin className="h-5 w-5 mr-3 text-[#8D6E63]" />
                 <a 
-                  href="https://www.linkedin.com/company/keberiti-financial-services" 
+                  href="https://www.linkedin.com/company/kuberiti-financial-services" 
                   target="_blank" 
                   rel="noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  Keberiti Financial Services
+                  Kuberiti Financial Services
                 </a>
               </div>
               

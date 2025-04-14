@@ -15,7 +15,7 @@ const Dashboard = () => {
   const { user } = useUser();
 
   useEffect(() => {
-    document.title = "Dashboard | Keberiti";
+    document.title = "Dashboard | Kuberiti";
   }, []);
 
   return (
