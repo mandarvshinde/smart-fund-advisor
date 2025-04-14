@@ -12,7 +12,7 @@ const Index = () => {
   const { isLoading, user } = useUser();
   
   useEffect(() => {
-    document.title = 'Kuberiti - Intelligent Investment Portfolio Management';
+    document.title = 'Kuberiti';
   }, []);
 
   if (isLoading) {
@@ -32,7 +32,7 @@ const Index = () => {
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <Logo className="h-10" />
+            <Logo className="h-15" />
             <div className="hidden md:flex space-x-4 mx-auto">
               <Link to="/funds" className="text-gray-700 font-medium hover:text-[#8D6E63]">Explore Funds</Link>
               <Link to="/calculator" className="text-gray-700 font-medium hover:text-[#8D6E63]">Calculator</Link>
@@ -85,6 +85,12 @@ const Index = () => {
                     <li className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
                       <span>Analyze fund holdings and sector exposure</span>
+                    </li><li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Portfolio reviews and recommendations</span>
+                    </li><li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Help choosing SIP or lumpsum investment options</span>
                     </li>
                   </ul>
                   <Button onClick={handleWhatsAppChat} size="lg" className="w-full bg-green-600 hover:bg-green-700">
@@ -112,7 +118,7 @@ const Index = () => {
             <div className="hidden lg:block">
               <img
                 src="/lovable-uploads/51289d21-30ea-4bc6-bc74-ca4b8c933683.png"
-                alt="Kuberiti Investment"
+                alt="Kuberiti"
                 className="w-full max-w-md mx-auto"
               />
             </div>
@@ -130,7 +136,7 @@ const Index = () => {
             <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm">
               <Button onClick={handleWhatsAppChat} size="lg" className="bg-green-600 hover:bg-green-700 w-full">
                 <MessageSquare className="mr-2 h-5 w-5" />
-                Chat with an Expert on WhatsApp
+                Chat with an Expert
               </Button>
             </div>
           </div>
@@ -145,17 +151,17 @@ const Index = () => {
                 <Users className="h-8 w-8 text-[#5D4037]" />
               </div>
               <h3 className="text-xl font-semibold text-[#5D4037] mb-3">Connect with an expert</h3>
-              <p className="text-gray-700 mb-4">
+              {/*<p className="text-gray-700 mb-4">
                 100% Safe Transactions
-              </p>
+              </p>*/}
               <p className="text-gray-700 mb-4">
-                Your money goes directly from you to Asset Management Companies (AMCs) ensuring complete safety.
+              Need help with your investments? Our experts are here to help you make confident, informed decisions. Our experts offer personalized guidance tailored to your financial goals.
               </p>
-              <Button asChild variant="outline" className="w-full mt-2" onClick={handleWhatsAppChat}>
+              {/*<Button asChild variant="outline" className="w-full mt-2" onClick={handleWhatsAppChat}>
                 <Link to="#">
                   Connect with an expert
                 </Link>
-              </Button>
+              </Button>*/}
             </div>
             
             <div className="bg-white p-8 rounded-lg shadow-sm">
@@ -164,10 +170,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold text-[#5D4037] mb-3">100% Safe Transactions</h3>
               <p className="text-gray-700 mb-4">
-                Your money goes directly from you to BSE and then to the Mutual Fund company via our BSE integration, ensuring complete safety.
-              </p>
-              <p className="text-sm font-medium text-[#5D4037]">
-                ARN-323568 - Registered with Association of Mutual Funds in India
+              Your money goes directly from you to Asset Management Companies (AMCs) ensuring complete safety.
               </p>
             </div>
             
@@ -179,11 +182,6 @@ const Index = () => {
               <p className="text-gray-700 mb-4">
                 You invest in Regular Mutual Funds, with Kuberiti earning a small commission from the fund houses. We charge no additional fees.
               </p>
-              <Button asChild className="w-full mt-2">
-                <Link to="/funds">
-                  Start investing
-                </Link>
-              </Button>
             </div>
           </div>
           

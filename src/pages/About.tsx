@@ -92,7 +92,7 @@ const About = () => {
   return (
     <PageLayout 
       title="About Us" 
-      subtitle="Learn more about Kuberiti Financial Services"
+      //subtitle="Learn more about Kuberiti Financial Services"
     >
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-5">
         <div className="lg:col-span-3 space-y-6">
@@ -164,12 +164,12 @@ const About = () => {
               <div className="flex items-center">
                 <Linkedin className="h-5 w-5 mr-3 text-[#8D6E63]" />
                 <a 
-                  href="https://www.linkedin.com/company/kuberiti-financial-services" 
+                  href="https://www.linkedin.com/company/kuberiti/?viewAsMember=true" 
                   target="_blank" 
                   rel="noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  Kuberiti Financial Services
+                  Kuberiti
                 </a>
               </div>
               
@@ -179,7 +179,7 @@ const About = () => {
                   className="w-full bg-green-600 hover:bg-green-700"
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  Chat with us on WhatsApp
+                  Chat with Us
                 </Button>
               </div>
             </CardContent>

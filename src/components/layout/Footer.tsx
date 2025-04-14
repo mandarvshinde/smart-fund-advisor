@@ -54,13 +54,13 @@ const Footer = () => {
             <h3 className="font-medium text-gray-900 mb-3">Contact Us</h3>
             <p className="text-sm text-gray-600 mb-2">kuberitifinancialservices@gmail.com</p>
             
-            <div className="bg-[#EFEBE9] p-4 rounded-lg mt-4">
+            {/*<div className="bg-[#EFEBE9] p-4 rounded-lg mt-4">
               <h4 className="font-medium text-[#5D4037] mb-2">Ready to Optimize Your Investments?</h4>
               <p className="text-sm text-gray-600 mb-3">Join Kuberiti today and take advantage of our powerful tools to research, analyze, and manage your mutual fund portfolio.</p>
               <Button asChild className="w-full">
                 <Link to="/register">Start Investing Now</Link>
               </Button>
-            </div>
+            </div>*/}
           </div>
         </div>
         

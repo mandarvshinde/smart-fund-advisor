@@ -72,7 +72,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <Home className="h-4 w-4" />
+                  <Home className="h-6 w-6" />
                   <span>Dashboard</span>
                 </div>
               </Link>
@@ -81,7 +81,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <PieChart className="h-4 w-4" />
+                  <PieChart className="h-6 w-6" />
                   <span>Investments</span>
                 </div>
               </Link>
@@ -90,7 +90,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <BarChart3 className="h-4 w-4" />
+                  <BarChart3 className="h-6 w-6" />
                   <span>Explore Funds</span>
                 </div>
               </Link>
@@ -99,7 +99,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <Target className="h-4 w-4" />
+                  <Target className="h-6 w-6" />
                   <span>Goals</span>
                 </div>
               </Link>
@@ -108,7 +108,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <Calculator className="h-4 w-4" />
+                  <Calculator className="h-6 w-6" />
                   <span>Calculator</span>
                 </div>
               </Link>
@@ -117,7 +117,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <HelpCircle className="h-4 w-4" />
+                  <HelpCircle className="h-6 w-6" />
                   <span>AI Advisor</span>
                 </div>
               </Link>
@@ -126,7 +126,7 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-[#8D6E63] transition-colors"
               >
                 <div className="flex items-center space-x-1">
-                  <Info className="h-4 w-4" />
+                  <Info className="h-6 w-6" />
                   <span>About Us</span>
                 </div>
               </Link>

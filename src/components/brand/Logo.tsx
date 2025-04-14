@@ -12,7 +12,7 @@ const Logo = ({ className }: LogoProps) => {
         <img 
           src="/lovable-uploads/51289d21-30ea-4bc6-bc74-ca4b8c933683.png" 
           alt="Kuberiti Logo" 
-          className="h-10 w-auto" 
+          className="h-20 w-auto" 
         />
       </div>
     </Link>
