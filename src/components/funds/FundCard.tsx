@@ -5,9 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, Info, TrendingUp, AlertCircle, MessageSquare } from "lucide-react";
+import { BarChart3, Info, TrendingUp, AlertCircle, MessageSquare, Calendar, DollarSign, PieChart, Users, Award } from "lucide-react";
 import { fetchFundDetails } from "@/services/fundService";
 import { Fund } from "@/types";
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
 
 interface FundCardProps {
   fund: Fund;
@@ -67,18 +69,71 @@ export const FundCard = ({ fund }: FundCardProps) => {
                 <Skeleton className="h-4 w-3/4" />
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="flex items-center text-sm">
-                  <AlertCircle className="w-4 h-4 mr-2 text-amber-600" />
-                  <span>Risk Level: {details?.riskLevel || 'Moderate'}</span>
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="grid grid-cols-2 gap-y-2">
+                    <div className="text-xs text-gray-500">Fund Type</div>
+                    <div className="text-xs font-medium">{details?.category || 'Equity'}</div>
+                    
+                    <div className="text-xs text-gray-500">Risk Level</div>
+                    <div className="text-xs font-medium">{details?.riskLevel || 'Moderate'}</div>
+                    
+                    <div className="text-xs text-gray-500">Expense Ratio</div>
+                    <div className="text-xs font-medium">{details?.expenseRatio || '1.2%'}</div>
+                    
+                    <div className="text-xs text-gray-500">AUM Size</div>
+                    <div className="text-xs font-medium">{details?.aum || 'NA'}</div>
+                  </div>
                 </div>
-                <div className="flex items-center text-sm">
-                  <TrendingUp className="w-4 h-4 mr-2 text-blue-600" />
-                  <span>3Y Returns: {details?.returns?.threeYear ? `${details.returns.threeYear.toFixed(2)}%` : 'NA'}</span>
+                
+                <div>
+                  <div className="flex items-center mb-2">
+                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-blue-600" />
+                    <span className="text-xs font-medium">Historical Returns</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span>1 Year</span>
+                        <span className={`${details?.returns?.oneYear && details.returns.oneYear > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {details?.returns?.oneYear ? details.returns.oneYear.toFixed(2) + '%' : 'NA'}
+                        </span>
+                      </div>
+                      <Progress value={Math.min(Math.abs(details?.returns?.oneYear || 0) * 1.5, 100)} className="h-1" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span>3 Years</span>
+                        <span className={`${details?.returns?.threeYear && details.returns.threeYear > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {details?.returns?.threeYear ? details.returns.threeYear.toFixed(2) + '%' : 'NA'}
+                        </span>
+                      </div>
+                      <Progress value={Math.min(Math.abs(details?.returns?.threeYear || 0) * 0.8, 100)} className="h-1" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span>5 Years</span>
+                        <span className={`${details?.returns?.fiveYear && details.returns.fiveYear > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {details?.returns?.fiveYear ? details.returns.fiveYear.toFixed(2) + '%' : 'NA'}
+                        </span>
+                      </div>
+                      <Progress value={Math.min(Math.abs(details?.returns?.fiveYear || 0) * 0.6, 100)} className="h-1" />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center text-sm">
-                  <BarChart3 className="w-4 h-4 mr-2 text-purple-600" />
-                  <span>Category: {details?.category || fund.category || 'Equity'}</span>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center">
+                    <Calendar className="h-3.5 w-3.5 mr-1 text-gray-500" />
+                    <span>Launch Date: {details?.launchDate || 'NA'}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="h-3.5 w-3.5 mr-1 text-gray-500" />
+                    <span>Min Investment: ₹500</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -106,3 +161,5 @@ export const FundCard = ({ fund }: FundCardProps) => {
     </Card>
   );
 };
+
+export default FundCard;

@@ -1,10 +1,12 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import Logo from '@/components/brand/Logo';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Shield, TrendingUp, Target, BarChart3, Calculator, MessageSquare, CheckCircle, LockKeyhole, DollarSign, Users, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import Footer from '@/components/layout/Footer';
 
 const Index = () => {
   const { isLoading, user } = useUser();
@@ -255,6 +257,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
