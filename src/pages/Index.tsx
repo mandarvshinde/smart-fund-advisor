@@ -22,6 +22,10 @@ const Index = () => {
       </div>
     );
   }
+  
+  const handleWhatsAppChat = () => {
+    window.open('https://wa.me/918446597048?text=Hello,%20I%20am%20interested%20in%20your%20investment%20services.', '_blank');
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -85,11 +89,9 @@ const Index = () => {
                       <span>Analyze fund holdings and sector exposure</span>
                     </li>
                   </ul>
-                  <Button asChild size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                    <Link to="/chat">
-                      <MessageSquare className="mr-2 h-5 w-5" />
-                      Chat with Us
-                    </Link>
+                  <Button onClick={handleWhatsAppChat} size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                    <MessageSquare className="mr-2 h-5 w-5" />
+                    Chat with Us
                   </Button>
                 </CardContent>
               </Card>
@@ -184,38 +186,32 @@ const Index = () => {
                 </ul>
               </div>
               
-              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 w-full">
-                <Link to="/chat">
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Chat with an Expert on WhatsApp
-                </Link>
+              <Button onClick={handleWhatsAppChat} size="lg" className="bg-green-600 hover:bg-green-700 w-full">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Chat with an Expert on WhatsApp
               </Button>
             </div>
           </div>
         </div>
       </section>
       
-      {/* More About Us Section */}
+      {/* "Connect with an expert" Section - Updated */}
       <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#5D4037]">More About Us</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              India's only Mutual Funds Platform where you can get personalized help from investment experts
-            </p>
-          </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-sm">
               <div className="bg-[#D7CCC8] p-3 rounded-full w-14 h-14 flex items-center justify-center mb-4">
                 <Users className="h-8 w-8 text-[#5D4037]" />
               </div>
-              <h3 className="text-xl font-semibold text-[#5D4037] mb-3">Expert Guidance</h3>
+              <h3 className="text-xl font-semibold text-[#5D4037] mb-3">Connect with an expert</h3>
               <p className="text-gray-700 mb-4">
-                Get personalized recommendations, portfolio reviews, and investment advice from our expert advisors via WhatsApp.
+                100% Safe Transactions
               </p>
-              <Button asChild variant="outline" className="w-full mt-2">
-                <Link to="/chat">
+              <p className="text-gray-700 mb-4">
+                Your money goes directly from you to Asset Management Companies (AMCs) ensuring complete safety.
+              </p>
+              <Button asChild variant="outline" className="w-full mt-2" onClick={handleWhatsAppChat}>
+                <Link to="#">
                   Connect with an expert
                 </Link>
               </Button>
@@ -251,11 +247,9 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-              <Link to="/chat">
-                <MessageSquare className="mr-2 h-5 w-5" />
-                Chat with us on WhatsApp
-              </Link>
+            <Button onClick={handleWhatsAppChat} size="lg" className="bg-green-600 hover:bg-green-700">
+              <MessageSquare className="mr-2 h-5 w-5" />
+              Chat with us on WhatsApp
             </Button>
           </div>
         </div>
@@ -272,7 +266,7 @@ const Index = () => {
           <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm max-w-3xl mx-auto">
             <h3 className="text-2xl font-bold mb-4 text-[#5D4037]">Ready to Optimize Your Mutual Fund Investments?</h3>
             <p className="mb-8">
-              Join FundWise India today and take advantage of our powerful tools to research, analyze, and manage your mutual fund portfolio.
+              Join Kuberiti today and take advantage of our powerful tools to research, analyze, and manage your mutual fund portfolio.
             </p>
             
             <Button asChild size="lg" className="bg-[#8D6E63] hover:bg-[#6D4C41] text-white">
@@ -325,22 +319,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 sm:mb-0">
-              <Logo className="h-8 w-auto mr-2" />
-              <span className="text-sm text-gray-500">© {new Date().getFullYear()} All rights reserved.</span>
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-[#8D6E63]">Terms</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-[#8D6E63]">Privacy</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-[#8D6E63]">Help</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer is in PageLayout now */}
     </div>
   );
 };
