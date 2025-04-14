@@ -1,6 +1,6 @@
 
 import { Fund, FundDetails } from '@/types';
-import { fetchMutualFunds } from './mockData';
+import { fetchMutualFunds } from '@/services/mockData';
 
 // In a real app, we would fetch this data from mfapi.com
 // For demo purposes, we're using mock data and simulating API calls
@@ -28,7 +28,7 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
   
   // Find the fund in our mock data
   const mockFunds = fetchMutualFunds();
-  const fund = mockFunds.find(f => f.id === schemeCode);
+  const fund = mockFunds.find(f => f.schemeCode === schemeCode);
   
   if (!fund) return null;
   
@@ -72,11 +72,11 @@ const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {
     case 'returns-asc':
       return sortedFunds.sort((a, b) => (a.returns?.oneYear || 0) - (b.returns?.oneYear || 0));
     case 'nav':
-      return sortedFunds.sort((a, b) => (b.price || 0) - (a.price || 0));
+      return sortedFunds.sort((a, b) => parseFloat(b.nav) - parseFloat(a.nav));
     case 'nav-asc':
-      return sortedFunds.sort((a, b) => (a.price || 0) - (b.price || 0));
+      return sortedFunds.sort((a, b) => parseFloat(a.nav) - parseFloat(b.nav));
     case 'alpha':
-      return sortedFunds.sort((a, b) => a.name.localeCompare(b.name));
+      return sortedFunds.sort((a, b) => a.schemeName.localeCompare(b.schemeName));
     default:
       return sortedFunds;
   }

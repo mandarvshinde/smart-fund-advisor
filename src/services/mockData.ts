@@ -11,71 +11,41 @@ const getRandomInteger = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Function to generate a random price
-const generateRandomPrice = (): number => {
-  return parseFloat((Math.random() * 200).toFixed(2));
-};
-
-// Function to generate a realistic-looking fund name
-const generateFundName = (): string => {
-  const prefixes = ['SBI', 'HDFC', 'ICICI Prudential', 'Axis', 'Kotak', 'Reliance'];
-  const fundTypes = ['Bluechip', 'Midcap', 'Smallcap', 'Tax Saver', 'Balanced'];
-  const suffixes = ['Fund', 'Growth Fund', 'Equity Fund', 'Scheme'];
-
-  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-  const fundType = fundTypes[Math.floor(Math.random() * fundTypes.length)];
-  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-
-  return `${prefix} ${fundType} ${suffix}`;
-};
-
-// Function to generate a random fund category
-const generateRandomCategory = (): string => {
-  const categories: string[] = ['equity', 'debt', 'hybrid', 'index', 'elss'];
-  return categories[Math.floor(Math.random() * categories.length)];
-};
-
-// Function to generate a random fund object
-const generateRandomFund = (id: string): Fund => {
-  const category = generateRandomCategory();
-  const name = generateFundName();
-  const price = generateRandomPrice();
-
-  return {
-    id,
-    name,
-    category,
-    price,
-    returns: {
-      oneYear: parseFloat((Math.random() * 20).toFixed(2)),
-      threeYear: parseFloat((Math.random() * 25).toFixed(2)),
-      fiveYear: parseFloat((Math.random() * 30).toFixed(2))
-    },
-    rating: getRandomInteger(1, 5),
-    volatility: parseFloat((Math.random() * 5).toFixed(2)),
-    expenseRatio: parseFloat((Math.random() * 2).toFixed(2)),
-    aum: getRandomNumber(100, 10000),
-  };
-};
-
-// Function to generate multiple random fund objects
-export const generateRandomFunds = (count: number): Fund[] => {
+// Function to generate random mutual funds
+export const generateMutualFunds = (): Fund[] => {
   const funds: Fund[] = [];
-  for (let i = 0; i < count; i++) {
-    funds.push(generateRandomFund(String(i + 1)));
+  const fundTypes = ['Large Cap', 'Mid Cap', 'Small Cap', 'Multi Cap', 'Index', 'ELSS', 'Debt', 'Hybrid'];
+  const fundHouses = ['SBI', 'HDFC', 'ICICI', 'Axis', 'Kotak', 'Tata', 'Aditya Birla', 'DSP', 'UTI'];
+  
+  for (let i = 1; i <= 20; i++) {
+    const fundHouse = fundHouses[Math.floor(Math.random() * fundHouses.length)];
+    const fundType = fundTypes[Math.floor(Math.random() * fundTypes.length)];
+    const oneYearReturn = parseFloat((Math.random() * 30 - 5).toFixed(2));
+    
+    funds.push({
+      schemeCode: `1000${i}`,
+      schemeName: `${fundHouse} ${fundType} Fund`,
+      nav: (Math.random() * 500 + 10).toFixed(2),
+      date: '2025-04-12',
+      fundHouse,
+      category: fundType.toLowerCase().includes('cap') ? 'equity' : 
+              fundType.toLowerCase() === 'elss' ? 'elss' : 
+              fundType.toLowerCase() === 'debt' ? 'debt' : 'hybrid',
+      returns: {
+        oneYear: oneYearReturn,
+        threeYear: parseFloat((oneYearReturn + Math.random() * 15).toFixed(2)),
+        fiveYear: parseFloat((oneYearReturn + Math.random() * 25).toFixed(2))
+      }
+    });
   }
+  
   return funds;
 };
 
-// Create a mock set of mutual funds for the application
-export const mockFunds = generateRandomFunds(20);
+// Create the mock funds once and export the function to access them
+const mockFunds = generateMutualFunds();
 
-// Function to filter funds by category
-export const filterFundsByCategory = (funds: Fund[], category: string): Fund[] => {
-  return funds.filter(fund => fund.category === category);
-};
-
-// Function to fetch mutual funds - this was missing
+// Function to fetch the mock mutual funds
 export const fetchMutualFunds = (): Fund[] => {
   return mockFunds;
 };
@@ -134,6 +104,8 @@ export interface InvestmentHistoryItem {
   sipAmount: number;
   lastTransactionDate: Date;
   returns: number;
+  totalInvested?: number;
+  annualizedReturn?: number;
 }
 
 export const fetchInvestments = (): InvestmentHistoryItem[] => {
@@ -148,6 +120,8 @@ export const fetchInvestments = (): InvestmentHistoryItem[] => {
       sipAmount: 5000,
       lastTransactionDate: new Date('2023-12-20'),
       returns: 15.86,
+      totalInvested: 250000,
+      annualizedReturn: 15.86
     },
     {
       id: '2',
@@ -159,6 +133,8 @@ export const fetchInvestments = (): InvestmentHistoryItem[] => {
       sipAmount: 3000,
       lastTransactionDate: new Date('2023-12-15'),
       returns: 19.18,
+      totalInvested: 180000,
+      annualizedReturn: 19.18
     },
     {
       id: '3',
@@ -170,6 +146,8 @@ export const fetchInvestments = (): InvestmentHistoryItem[] => {
       sipAmount: 0,
       lastTransactionDate: new Date('2023-06-10'),
       returns: 6.09,
+      totalInvested: 300000,
+      annualizedReturn: 6.09
     },
     {
       id: '4',
@@ -181,6 +159,8 @@ export const fetchInvestments = (): InvestmentHistoryItem[] => {
       sipAmount: 2500,
       lastTransactionDate: new Date('2023-12-18'),
       returns: 25.59,
+      totalInvested: 125000,
+      annualizedReturn: 25.59
     },
   ];
   
@@ -197,8 +177,9 @@ export const fetchGoals = (): Goal[] => {
       targetDate: '2035-07-01',
       currentAmount: 450000,
       monthlyContribution: 7500,
-      linkedFunds: ['HDFC Index Fund', 'Axis Long Term Equity Fund'],
       progress: 22.5,
+      investments: ['HDFC Index Fund', 'Axis Long Term Equity Fund'],
+      riskAppetite: 'moderate'
     },
     {
       id: '2',
@@ -207,8 +188,9 @@ export const fetchGoals = (): Goal[] => {
       targetDate: '2045-01-01',
       currentAmount: 1200000,
       monthlyContribution: 15000,
-      linkedFunds: ['SBI Corporate Bond Fund', 'ICICI Prudential Bluechip Fund', 'Kotak Emerging Equity Fund'],
       progress: 12,
+      investments: ['SBI Corporate Bond Fund', 'ICICI Prudential Bluechip Fund', 'Kotak Emerging Equity Fund'],
+      riskAppetite: 'high'
     },
     {
       id: '3',
@@ -217,8 +199,9 @@ export const fetchGoals = (): Goal[] => {
       targetDate: '2028-10-01',
       currentAmount: 1800000,
       monthlyContribution: 25000,
-      linkedFunds: ['SBI Corporate Bond Fund', 'Kotak Emerging Equity Fund'],
       progress: 36,
+      investments: ['SBI Corporate Bond Fund', 'Kotak Emerging Equity Fund'],
+      riskAppetite: 'moderate'
     },
     {
       id: '4',
@@ -227,8 +210,9 @@ export const fetchGoals = (): Goal[] => {
       targetDate: '2026-05-01',
       currentAmount: 120000,
       monthlyContribution: 8000,
-      linkedFunds: ['HDFC Money Market Fund'],
       progress: 24,
+      investments: ['HDFC Money Market Fund'],
+      riskAppetite: 'low'
     },
   ];
   
@@ -238,16 +222,6 @@ export const fetchGoals = (): Goal[] => {
 export const getGoalById = (id: string): Goal | undefined => {
   const goals = fetchGoals();
   return goals.find(goal => goal.id === id);
-};
-
-// Popular funds
-export const fetchPopularFunds = (): Fund[] => {
-  // Generate 5 random funds for popular funds
-  const popularFunds: Fund[] = [];
-  for (let i = 0; i < 5; i++) {
-    popularFunds.push(generateRandomFund(String(i + 1)));
-  }
-  return popularFunds;
 };
 
 // Market insights

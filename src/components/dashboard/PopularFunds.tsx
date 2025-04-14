@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers, LayoutList, ArrowUpDown, Carousel } from "lucide-react";
+import { ArrowRight, TrendingUp, FileText, Building, Diamond, Package, Layers, LayoutList, ArrowUpDown, LayoutGrid } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { Fund } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMutualFunds } from "@/services/mockData";
+import { fetchFundsList } from "@/services/fundService";
 import { 
   Carousel as CarouselComponent,
   CarouselContent,
@@ -45,31 +45,31 @@ const fundCategories = [
     id: "tax-saving",
     label: "Tax Saving",
     icon: <FileText className="h-4 w-4" />,
-    filter: (fund: Fund) => fund.category === 'elss' || (fund.subcategory && fund.subcategory.includes("Tax"))
+    filter: (fund: Fund) => fund.category === 'elss' || fund.category?.includes("Tax")
   },
   {
     id: "large-cap",
     label: "Large Cap",
     icon: <Building className="h-4 w-4" />,
-    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Large Cap"))
+    filter: (fund: Fund) => fund.category === 'equity' && fund.category?.includes("Large Cap")
   },
   {
     id: "small-cap",
     label: "Small Cap",
     icon: <Diamond className="h-4 w-4" />,
-    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Small Cap"))
+    filter: (fund: Fund) => fund.category === 'equity' && fund.category?.includes("Small Cap")
   },
   {
     id: "mid-cap",
     label: "Mid Cap",
     icon: <Package className="h-4 w-4" />,
-    filter: (fund: Fund) => fund.category === 'equity' && (fund.subcategory && fund.subcategory.includes("Mid Cap"))
+    filter: (fund: Fund) => fund.category === 'equity' && fund.category?.includes("Mid Cap")
   },
   {
     id: "multi-asset",
     label: "Multi Asset",
     icon: <Layers className="h-4 w-4" />,
-    filter: (fund: Fund) => fund.category === 'hybrid' || (fund.subcategory && fund.subcategory.includes("Dynamic"))
+    filter: (fund: Fund) => fund.category === 'hybrid' || fund.category?.includes("Dynamic")
   }
 ];
 
@@ -80,7 +80,7 @@ const FundCard = ({ fund }: { fund: Fund }) => {
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardContent className="p-4">
-        <h4 className="font-medium text-sm line-clamp-2 h-10">{fund.name}</h4>
+        <h4 className="font-medium text-sm line-clamp-2 h-10">{fund.schemeName}</h4>
         <Separator className="my-2" />
         <div className="flex justify-between items-center mt-1">
           <div>
@@ -91,10 +91,10 @@ const FundCard = ({ fund }: { fund: Fund }) => {
           </div>
           <div>
             <p className="text-xs text-gray-500">NAV</p>
-            <p className="text-sm font-semibold">₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '0.00'}</p>
+            <p className="text-sm font-semibold">₹{parseFloat(fund.nav).toFixed(2)}</p>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`/invest?fund=${fund.id}`}>
+            <Link to={`/invest?fund=${fund.schemeCode}`}>
               Invest
             </Link>
           </Button>
@@ -107,14 +107,14 @@ const FundCard = ({ fund }: { fund: Fund }) => {
 export const PopularFunds = () => {
   const { data: funds = [], isLoading } = useQuery({
     queryKey: ['mutualFunds'],
-    queryFn: fetchMutualFunds,
+    queryFn: () => fetchFundsList('all', 'returns'),
   });
 
   const [activeCategory, setActiveCategory] = useState("high-return");
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Fund | null;
+    key: "returns" | "nav" | "schemeName";
     direction: "asc" | "desc";
   }>({
     key: "returns",
@@ -143,11 +143,15 @@ export const PopularFunds = () => {
           const bReturn = b.returns?.oneYear || 0;
           return sortConfig.direction === "asc" ? aReturn - bReturn : bReturn - aReturn;
         }
-        if (a[sortConfig.key!] < b[sortConfig.key!]) {
-          return sortConfig.direction === "asc" ? -1 : 1;
+        if (sortConfig.key === "nav") {
+          const aNav = parseFloat(a.nav);
+          const bNav = parseFloat(b.nav);
+          return sortConfig.direction === "asc" ? aNav - bNav : bNav - aNav;
         }
-        if (a[sortConfig.key!] > b[sortConfig.key!]) {
-          return sortConfig.direction === "asc" ? 1 : -1;
+        if (sortConfig.key === "schemeName") {
+          return sortConfig.direction === "asc" 
+            ? a.schemeName.localeCompare(b.schemeName) 
+            : b.schemeName.localeCompare(a.schemeName);
         }
         return 0;
       });
@@ -168,14 +172,14 @@ export const PopularFunds = () => {
 
   const totalPages = Math.ceil(sortedFunds.length / ITEMS_PER_PAGE);
 
-  const handleSort = (key: keyof Fund) => {
+  const handleSort = (key: "returns" | "nav" | "schemeName") => {
     setSortConfig(prevConfig => ({
       key,
       direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
     }));
   };
 
-  const getSortIcon = (key: keyof Fund) => {
+  const getSortIcon = (key: "returns" | "nav" | "schemeName") => {
     if (sortConfig.key !== key) {
       return <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />;
     }
@@ -218,7 +222,7 @@ export const PopularFunds = () => {
               onClick={() => setViewMode("cards")}
               className="rounded-none"
             >
-              <Carousel className="h-4 w-4" />
+              <LayoutGrid className="h-4 w-4" />
             </Button>
             <Button
               variant={viewMode === "list" ? "default" : "ghost"}
@@ -270,7 +274,7 @@ export const PopularFunds = () => {
                 >
                   <CarouselContent>
                     {carouselFunds.map(fund => (
-                      <CarouselItem key={fund.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4">
+                      <CarouselItem key={fund.schemeCode} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4">
                         <FundCard fund={fund} />
                       </CarouselItem>
                     ))}
@@ -292,9 +296,9 @@ export const PopularFunds = () => {
                             variant="ghost" 
                             size="sm" 
                             className="font-medium p-0 h-auto" 
-                            onClick={() => handleSort("name")}
+                            onClick={() => handleSort("schemeName")}
                           >
-                            Fund Name {getSortIcon("name")}
+                            Fund Name {getSortIcon("schemeName")}
                           </Button>
                         </TableHead>
                         <TableHead className="w-[120px]">
@@ -321,11 +325,11 @@ export const PopularFunds = () => {
                     </TableHeader>
                     <TableBody>
                       {paginatedFunds.map(fund => (
-                        <TableRow key={fund.id}>
+                        <TableRow key={fund.schemeCode}>
                           <TableCell className="font-medium">
                             <div>
-                              <div className="truncate max-w-[220px]">{fund.name}</div>
-                              <div className="text-xs text-gray-500">{fund.fundHouse || fund.name.split(' ')[0]}</div>
+                              <div className="truncate max-w-[220px]">{fund.schemeName}</div>
+                              <div className="text-xs text-gray-500">{fund.fundHouse || fund.schemeName.split(' ')[0]}</div>
                             </div>
                           </TableCell>
                           <TableCell className={`${fund.returns?.oneYear && fund.returns.oneYear > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
@@ -337,10 +341,10 @@ export const PopularFunds = () => {
                           <TableCell className={`${fund.returns?.fiveYear && fund.returns.fiveYear > 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
                             {fund.returns?.fiveYear ? fund.returns.fiveYear.toFixed(2) : '0.00'}%
                           </TableCell>
-                          <TableCell>₹{fund.price?.toFixed(2) || fund.nav?.toFixed(2) || '0.00'}</TableCell>
+                          <TableCell>₹{parseFloat(fund.nav).toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             <Button variant="outline" size="sm" asChild>
-                              <Link to={`/invest?fund=${fund.id}`}>
+                              <Link to={`/invest?fund=${fund.schemeCode}`}>
                                 Invest
                               </Link>
                             </Button>

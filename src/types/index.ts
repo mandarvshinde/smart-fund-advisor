@@ -50,6 +50,7 @@ export interface Goal {
   riskAppetite: 'low' | 'moderate' | 'high';
   monthlyContribution?: number;
   expectedReturn?: number;
+  linkedFunds?: string[];
 }
 
 export interface Recommendation {
