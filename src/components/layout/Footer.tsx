@@ -35,7 +35,6 @@ const Footer = () => {
               <li><Link to="/calculator" className="text-sm text-gray-600 hover:text-[#8D6E63]">Returns Calculator</Link></li>
               <li><Link to="/dashboard" className="text-sm text-gray-600 hover:text-[#8D6E63]">Portfolio Manager</Link></li>
               <li><Link to="/calculator" className="text-sm text-gray-600 hover:text-[#8D6E63]">SIP vs Lumpsum</Link></li>
-              <li><Link to="/about" className="text-sm text-gray-600 hover:text-[#8D6E63]">Contact Us</Link></li>
             </ul>
           </div>
           
