@@ -12,12 +12,12 @@ const Footer = () => {
 
   return (
     <footer className="bg-white border-t mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <Logo className="h-10 w-auto" />
-            <p className="text-sm text-gray-600">
-              Simplifying mutual fund investments for every Indian investor. Make informed decisions with our powerful tools and insights.
+            <Logo className="h-17 w-auto" />
+            <p className="text-md text-gray-600">
+            The Algorithm of Prosperity.
             </p>
             <Button 
               onClick={handleWhatsAppChat} 

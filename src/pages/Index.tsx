@@ -18,7 +18,7 @@ const Index = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5D4037]"></div>
+        <div className="animate-spin rounded-full h-17 w-12 border-t-2 border-b-2 border-[#5D4037]"></div>
       </div>
     );
   }
@@ -32,7 +32,7 @@ const Index = () => {
       <header className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <Logo className="h-15" />
+            <Logo className="h-17" />
             <div className="hidden md:flex space-x-16 mx-auto">
               <Link to="/funds" className="text-gray-700 font-medium hover:text-[#8D6E63]">Explore Funds</Link>
               <Link to="/calculator" className="text-gray-700 font-medium hover:text-[#8D6E63]">Calculator</Link>
@@ -66,7 +66,7 @@ const Index = () => {
                 Smart Investment Solutions for Your Future
               </h1>
               <p className="mt-6 text-lg text-gray-700">
-                Take control of your financial future with an intelligent investment portfolio—customized to your goals and risk profile. From beginners to seasoned investors, make smarter, data-driven decisions with powerful insights and comprehensive analysis.
+                Take control of your financial future with an intelligent investment portfolio customized to your goals and risk profile. From beginners to seasoned investors, make smarter, data-driven decisions with powerful insights and comprehensive analysis.
               </p>
               
               <Card className="mt-8 bg-white/80 backdrop-blur shadow-md border-2 border-[#D7CCC8]">
