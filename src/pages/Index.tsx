@@ -136,28 +136,28 @@ const Index = () => {
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div className="bg-[#FFF8E1] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+      <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
         <h3 className="text-xl font-semibold text-[#4E342E] mb-6">AI-Powered Fund Matching</h3>
         <p className="text-gray-700 text-sm">
           We analyze thousands of schemes so you don't have to—our intelligent engine matches you with funds that fit your profile, goals, and risk appetite.
         </p>
       </div>
 
-      <div className="bg-[#FFF3E0] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+      <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
         <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Expert-Curated Recommendations</h3>
         <p className="text-gray-700 text-sm">
           Backed by research, powered by data—every suggestion is vetted by finance pros and market trends.
         </p>
       </div>
 
-      <div className="bg-[#FFE0B2] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+      <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
         <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Goal-Based Filtering</h3>
         <p className="text-gray-700 text-sm">
           Whether it’s wealth creation, tax saving, or retirement planning—we recommend what’s right for your purpose.
         </p>
       </div>
 
-      <div className="bg-[#FFECB3] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+      <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
         <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Real-Time Performance Tracking</h3>
         <p className="text-gray-700 text-sm">
           We continuously monitor fund performance, so you stay invested in what works best—always.

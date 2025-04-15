@@ -35,6 +35,7 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
   // Return enhanced details (in a real app, this would come from the API)
   return {
     ...fund,
+    nav: fund.nav || (Math.random() * 100 + 10).toFixed(2), // Ensure 'nav' is included
     riskLevel: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)],
     expenseRatio: (Math.random() * 2 + 0.5).toFixed(2),
     aum: `₹${(Math.random() * 20000 + 1000).toFixed(2)} Cr`,
@@ -59,7 +60,10 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
       { company: 'Reliance Industries Ltd', allocation: 6.5 },
       { company: 'Infosys Ltd', allocation: 5.8 },
       { company: 'TCS Ltd', allocation: 4.9 },
-    ]
+    ],
+    fundHouse: fund.fundHouse || 'Default Fund House', // Add the required 'fundHouse' property
+    date: new Date().toISOString(), // Add the required 'date' property
+    category: fund.category || 'Uncategorized' // Ensure 'category' is always included
   };
 };
 
