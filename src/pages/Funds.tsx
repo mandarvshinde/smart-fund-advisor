@@ -24,12 +24,10 @@ const Funds = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,
-    onSettled: (data, error) => {
-      if (error) {
-        toast.error("Failed to load funds. Please try again later.", {
-          duration: 5000,
-        });
-      }
+    onError: (error) => {
+      toast.error("Failed to load funds. Please try again later.", {
+        duration: 5000,
+      });
     }
   });
 

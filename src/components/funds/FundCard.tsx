@@ -77,12 +77,6 @@ export const FundCard = ({ fund }: FundCardProps) => {
                     
                     <div className="text-xs text-gray-500">Risk Level</div>
                     <div className="text-xs font-medium">{details?.riskLevel || 'Moderate'}</div>
-                    
-                    <div className="text-xs text-gray-500">Expense Ratio</div>
-                    <div className="text-xs font-medium">{details?.expenseRatio || '1.2%'}</div>
-                    
-                    <div className="text-xs text-gray-500">AUM Size</div>
-                    <div className="text-xs font-medium">{details?.aum || 'NA'}</div>
                   </div>
                 </div>
                 

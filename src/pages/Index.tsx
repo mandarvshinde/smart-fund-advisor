@@ -126,55 +126,54 @@ const Index = () => {
         </div>
       </section>
 
-      {/*<section className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] py-0"></section>*/}
+      <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8 text-[#5D4037]">
+            Explore Popular Mutual Funds
+          </h2>
+          <PopularFunds />
+        </div>
+      </section>
 
-    <div className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] max-w-8xl mx-auto px-8 sm:px-4 lg:px-12 ">
-    <div className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] max-w-7xl mx-auto px-8 sm:px-4 lg:px-12 text-center mb-8 py-1">
-      <h2 className="text-3xl font-bold text-[#5D4037]">
-        Helping You Choose the Right Investment, Every Time
-      </h2>
-    </div>
+      <div className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] max-w-8xl mx-auto px-8 sm:px-4 lg:px-12 ">
+        <div className="bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD] max-w-7xl mx-auto px-8 sm:px-4 lg:px-12 text-center mb-8 py-1">
+          <h2 className="text-3xl font-bold text-[#5D4037]">
+            Helping You Choose the Right Investment, Every Time
+          </h2>
+        </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
-        <h3 className="text-xl font-semibold text-[#4E342E] mb-6">AI-Powered Fund Matching</h3>
-        <p className="text-gray-700 text-sm">
-          We analyze thousands of schemes so you don't have to—our intelligent engine matches you with funds that fit your profile, goals, and risk appetite.
-        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+            <h3 className="text-xl font-semibold text-[#4E342E] mb-6">AI-Powered Fund Matching</h3>
+            <p className="text-gray-700 text-sm">
+              We analyze thousands of schemes so you don't have to—our intelligent engine matches you with funds that fit your profile, goals, and risk appetite.
+            </p>
+          </div>
+
+          <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+            <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Expert-Curated Recommendations</h3>
+            <p className="text-gray-700 text-sm">
+              Backed by research, powered by data—every suggestion is vetted by finance pros and market trends.
+            </p>
+          </div>
+
+          <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+            <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Goal-Based Filtering</h3>
+            <p className="text-gray-700 text-sm">
+              Whether it’s wealth creation, tax saving, or retirement planning—we recommend what’s right for your purpose.
+            </p>
+          </div>
+
+          <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
+            <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Real-Time Performance Tracking</h3>
+            <p className="text-gray-700 text-sm">
+              We continuously monitor fund performance, so you stay invested in what works best—always.
+            </p>
+          </div>
+        </div>
       </div>
-
-      <div className="bg-[#a5d6a7] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
-        <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Expert-Curated Recommendations</h3>
-        <p className="text-gray-700 text-sm">
-          Backed by research, powered by data—every suggestion is vetted by finance pros and market trends.
-        </p>
-      </div>
-
-      <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
-        <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Goal-Based Filtering</h3>
-        <p className="text-gray-700 text-sm">
-          Whether it’s wealth creation, tax saving, or retirement planning—we recommend what’s right for your purpose.
-        </p>
-      </div>
-
-      <div className="bg-[#448aff] p-6 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 ease-in-out">
-        <h3 className="text-xl font-semibold text-[#4E342E] mb-6">Real-Time Performance Tracking</h3>
-        <p className="text-gray-700 text-sm">
-          We continuously monitor fund performance, so you stay invested in what works best—always.
-        </p>
-      </div>
-    </div>
-  </div>
           
       <div>
-        {/*<div className="space-y-8">
-          <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm">
-            <Button onClick={handleWhatsAppChat} size="lg" className="bg-green-600 hover:bg-green-700 w-full">
-              <MessageSquare className="mr-2 h-5 w-5" />
-              Chat with an Expert
-            </Button>
-          </div>
-        </div>*/}
       
         <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,17 +183,9 @@ const Index = () => {
                   <Users className="h-8 w-8 text-[#5D4037]" />
                 </div>
                 <h3 className="text-xl font-semibold text-[#5D4037] mb-3">Connect with an expert</h3>
-                {/*<p className="text-gray-700 mb-4">
-                  100% Safe Transactions
-                </p>*/}
                 <p className="text-gray-700 mb-4">
                 Need help with your investments? Our experts are here to help you make confident, informed decisions. Our experts offer personalized guidance tailored to your financial goals.
                 </p>
-                {/*<Button asChild variant="outline" className="w-full mt-2" onClick={handleWhatsAppChat}>
-                  <Link to="#">
-                    Connect with an expert
-                  </Link>
-                </Button>*/}
               </div>
               
               <div className="bg-white p-8 rounded-2xl shadow-sm">
@@ -227,28 +218,6 @@ const Index = () => {
           </div>
         </section>
       </div>
-
-      {/*<section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-[#5D4037]">What Our Users Say</h2>
-          <p className="text-lg mb-12 max-w-2xl mx-auto">
-            Join thousands of investors who trust Kuberiti for their investment journey.
-          </p>
-          
-          <div className="bg-[#EFEBE9] p-8 rounded-lg shadow-sm max-w-3xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4 text-[#5D4037]">Ready to Optimize Your Mutual Fund Investments?</h3>
-            <p className="mb-8">
-              Join Kuberiti today and take advantage of our powerful tools to research, analyze, and manage your mutual fund portfolio.
-            </p>
-            
-            <Button asChild size="lg" className="bg-[#8D6E63] hover:bg-[#6D4C41] text-white">
-              <Link to="/register">
-                Start Investing Now
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>*/}
 
       <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -289,15 +258,6 @@ const Index = () => {
               <p className="text-sm text-gray-600">Tailored to your financial goals</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-8 text-[#5D4037]">
-            Explore Popular Mutual Funds
-          </h2>
-          <PopularFunds />
         </div>
       </section>
 

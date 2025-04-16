@@ -22,6 +22,18 @@ import { Progress } from '@/components/ui/progress';
 import PageLayout from '@/components/layout/PageLayout';
 import { fetchFundDetails } from '@/services/fundService';
 import { FundDetails } from '@/types';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  BarChart,
+  Bar 
+} from 'recharts';
 
 const FundDetail = () => {
   const { schemeCode } = useParams<{ schemeCode: string }>();
@@ -34,12 +46,10 @@ const FundDetail = () => {
     staleTime: 1000 * 60 * 15, // 15 minutes
     refetchOnWindowFocus: false,
     retry: 2,
-    onSettled: (data, error) => {
-      if (error) {
-        toast.error("Failed to load fund details. Please try again later.", {
-          duration: 5000,
-        });
-      }
+    onError: (error) => {
+      toast.error("Failed to load fund details. Please try again later.", {
+        duration: 5000,
+      });
     }
   });
   
@@ -54,6 +64,45 @@ const FundDetail = () => {
   const handleWhatsAppChat = () => {
     window.open(`https://wa.me/918446597048?text=I'm interested in investing in ${fund?.schemeName}. Can you provide more information?`, '_blank');
   };
+  
+  // Generate performanceData for charts
+  const generatePerformanceData = () => {
+    if (!fund) return [];
+    
+    const returns = [
+      { name: '1M', value: fund.returns?.oneMonth || 0 },
+      { name: '3M', value: fund.returns?.threeMonth || 0 },
+      { name: '6M', value: fund.returns?.sixMonth || 0 },
+      { name: '1Y', value: fund.returns?.oneYear || 0 },
+      { name: '3Y', value: fund.returns?.threeYear || 0 },
+      { name: '5Y', value: fund.returns?.fiveYear || 0 }
+    ];
+    
+    return returns;
+  };
+  
+  // Generate growth chart data - simulated based on returns
+  const generateGrowthData = () => {
+    if (!fund) return [];
+    
+    const yearlyReturn = fund.returns?.oneYear || 10;
+    const data = [];
+    
+    // Create simulated growth chart for Rs 10,000 over 5 years
+    let value = 10000;
+    for (let i = 0; i <= 60; i += 3) {
+      const monthValue = value * (1 + (yearlyReturn/100/12) * i);
+      data.push({
+        month: i,
+        value: Math.round(monthValue)
+      });
+    }
+    
+    return data;
+  };
+  
+  const performanceData = generatePerformanceData();
+  const growthData = generateGrowthData();
   
   if (isLoading) {
     return (
@@ -291,54 +340,80 @@ const FundDetail = () => {
               <TabsContent value="performance">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-medium mb-2">Historical Performance</h3>
+                    <h3 className="font-medium mb-4">Historical Performance</h3>
                     <Card>
                       <CardContent className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-8">
                           <div>
-                            <h4 className="text-sm font-medium mb-4">Returns (%)</h4>
-                            <div className="space-y-4">
-                              <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>1 Year</span>
-                                  <span className={`${(fund.returns?.oneYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.oneYear ? `${fund.returns.oneYear.toFixed(2)}%` : 'NA'}
-                                  </span>
-                                </div>
-                                <Progress value={Math.min(Math.abs(fund.returns?.oneYear || 0) * 2, 100)} className="h-1.5" />
-                              </div>
-                              <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>3 Years (CAGR)</span>
-                                  <span className={`${(fund.returns?.threeYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.threeYear ? `${fund.returns.threeYear.toFixed(2)}%` : 'NA'}
-                                  </span>
-                                </div>
-                                <Progress value={Math.min(Math.abs(fund.returns?.threeYear || 0), 100)} className="h-1.5" />
-                              </div>
-                              <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>5 Years (CAGR)</span>
-                                  <span className={`${(fund.returns?.fiveYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.fiveYear ? `${fund.returns.fiveYear.toFixed(2)}%` : 'NA'}
-                                  </span>
-                                </div>
-                                <Progress value={Math.min(Math.abs(fund.returns?.fiveYear || 0), 100)} className="h-1.5" />
-                              </div>
+                            <h4 className="text-sm font-medium mb-3">Return Comparison (%)</h4>
+                            <div className="h-72">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                  data={performanceData}
+                                  margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                                >
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="name" />
+                                  <YAxis />
+                                  <Tooltip 
+                                    formatter={(value) => [`${value.toFixed(2)}%`, 'Return']}
+                                    labelFormatter={(value) => `${value} Return`}
+                                  />
+                                  <Legend />
+                                  <Bar
+                                    dataKey="value"
+                                    name="Return %"
+                                    fill="#8D6E63"
+                                    radius={[4, 4, 0, 0]}
+                                    barSize={40}
+                                  />
+                                </BarChart>
+                              </ResponsiveContainer>
                             </div>
                           </div>
                           
                           <div>
-                            <h4 className="text-sm font-medium mb-4">Benchmark Comparison</h4>
-                            <div className="bg-gray-50 p-4 rounded">
-                              <p className="text-gray-500 text-sm mb-4">Benchmark: {fund.category === 'Equity' ? 'Nifty 50' : fund.category === 'Debt' ? 'CRISIL Composite Bond Fund Index' : 'S&P BSE 200 TRI'}</p>
-                              
-                              <div className="flex items-center justify-center p-8">
-                                <p className="text-sm text-gray-600">
-                                  Benchmark comparison data not available from API
-                                </p>
-                              </div>
+                            <h4 className="text-sm font-medium mb-3">Growth of ₹10,000 since inception</h4>
+                            <div className="h-72">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <LineChart
+                                  data={growthData}
+                                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                >
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis 
+                                    dataKey="month" 
+                                    label={{ value: 'Months', position: 'insideBottomRight', offset: -10 }} 
+                                  />
+                                  <YAxis 
+                                    label={{ value: 'Value (₹)', angle: -90, position: 'insideLeft' }}
+                                    tickFormatter={(value) => `₹${value/1000}k`}
+                                  />
+                                  <Tooltip 
+                                    formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Value']}
+                                    labelFormatter={(value) => `Month ${value}`}
+                                  />
+                                  <Legend />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="value" 
+                                    name="Investment Value" 
+                                    stroke="#8D6E63" 
+                                    activeDot={{ r: 8 }} 
+                                    strokeWidth={2}
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
                             </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t">
+                          <div className="flex items-center">
+                            <AlertCircle className="text-amber-500 h-4 w-4 mr-2" />
+                            <p className="text-xs text-gray-600">
+                              Past performance is not indicative of future returns. The growth chart is simulated based on historical returns data.
+                            </p>
                           </div>
                         </div>
                       </CardContent>
