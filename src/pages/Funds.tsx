@@ -24,10 +24,12 @@ const Funds = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,
-    onError: (error) => {
-      toast.error("Failed to load funds. Please try again later.", {
-        duration: 5000,
-      });
+    meta: {
+      onError: () => {
+        toast.error("Failed to load funds. Please try again later.", {
+          duration: 5000,
+        });
+      }
     }
   });
 
@@ -44,7 +46,7 @@ const Funds = () => {
       title="Explore Mutual Funds" 
       subtitle="Discover and compare top-performing regular mutual funds to grow your investments"
     >
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg shadow-sm p-6 mb-6 border border-indigo-100">
         <FundFilters 
           activeCategory={category} 
           onCategoryChange={handleCategoryChange}
@@ -79,15 +81,15 @@ const Funds = () => {
           <p className="text-red-600 mb-4">We couldn't load the mutual fund data. Please try again later.</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 transition-colors"
           >
             Retry
           </button>
         </div>
       ) : funds?.length === 0 ? (
-        <div className="text-center py-10 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium text-gray-800 mb-1">No funds found</h3>
-          <p className="text-gray-600 mb-4">
+        <div className="text-center py-10 bg-indigo-50 rounded-lg border border-indigo-200">
+          <h3 className="text-lg font-medium text-indigo-800 mb-1">No funds found</h3>
+          <p className="text-indigo-600 mb-4">
             We couldn't find any mutual funds matching your criteria. Try changing your filters.
           </p>
         </div>

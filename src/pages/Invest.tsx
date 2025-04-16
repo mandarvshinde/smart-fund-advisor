@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -47,7 +46,7 @@ const Invest = () => {
     queryFn: () => fetchFundDetails(fundCode || ''),
     enabled: !!fundCode,
     staleTime: 1000 * 60 * 15, // 15 minutes
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true, // Changed from false to true
   });
   
   const form = useForm<InvestmentForm>({

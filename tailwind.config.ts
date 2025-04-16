@@ -63,16 +63,21 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom financial app colors
+				// Custom financial app colors - updated to vibrant scheme
 				finance: {
-					primary: '#6E4C1E', // Brown color from logo
-					secondary: '#B0813E', // Gold/amber color
-					accent: '#16a34a',
+					primary: '#6366f1', // Indigo
+					secondary: '#8b5cf6', // Purple
+					accent: '#06b6d4', // Cyan
 					muted: '#f3f4f6',
 					warning: '#f59e0b',
 					danger: '#ef4444',
 					success: '#10b981',
 				}
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'purple-gradient': 'linear-gradient(90deg, #8b5cf6, #6366f1)',
+				'vibrant-gradient': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -99,12 +104,17 @@ export default {
 				'pulse-slow': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' },
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-500px 0' },
+					'100%': { backgroundPosition: '500px 0' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'shimmer': 'shimmer 2s infinite linear'
 			}
 		}
 	},
