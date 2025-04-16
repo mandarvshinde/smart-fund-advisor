@@ -1,5 +1,5 @@
 
-import { Fund, FundDetails, ApiFundBasicInfo, ApiFundDetailsResponse } from '@/types';
+import { Fund, FundDetails } from '@/types';
 import axios from 'axios';
 
 const MFAPI_BASE_URL = 'https://api.mfapi.in';
@@ -8,16 +8,16 @@ const MFAPI_BASE_URL = 'https://api.mfapi.in';
 export const fetchFundsList = async (category: string, sortBy: string): Promise<Fund[]> => {
   try {
     // Fetch all mutual funds list from mfapi.in
-    const response = await axios.get<ApiFundBasicInfo[]>(`${MFAPI_BASE_URL}/mf`);
+    const response = await axios.get(`${MFAPI_BASE_URL}/mf`);
     const funds = response.data;
     
     // Transform API data to our Fund type
     let transformedFunds: Fund[] = await Promise.all(
-      // Limit to 100 funds to avoid too many requests
-      funds.slice(0, 100).map(async (fund) => {
+      // Limit to 50 funds for faster loading
+      funds.slice(0, 50).map(async (fund: {schemeCode: number, schemeName: string}) => {
         try {
           // Get basic details for each fund to get NAV and date
-          const detailsResponse = await axios.get<ApiFundDetailsResponse>(
+          const detailsResponse = await axios.get(
             `${MFAPI_BASE_URL}/mf/${fund.schemeCode}`
           );
           
@@ -52,8 +52,7 @@ export const fetchFundsList = async (category: string, sortBy: string): Promise<
               fundHouse: detailsResponse.data.meta.fund_house,
               category: category,
               returns: {
-                // Note: These are mock returns as the API doesn't provide them
-                // In a real app, you'd calculate these from historical NAV data
+                // Note: These are approximations as the API doesn't provide returns directly
                 oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
                 threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
                 fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
@@ -89,7 +88,7 @@ export const fetchFundsList = async (category: string, sortBy: string): Promise<
 export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails | null> => {
   try {
     // Fetch fund details from the API
-    const response = await axios.get<ApiFundDetailsResponse>(
+    const response = await axios.get(
       `${MFAPI_BASE_URL}/mf/${schemeCode}`
     );
     
@@ -149,7 +148,7 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
       category = 'ELSS';
     }
     
-    // Return enhanced details
+    // Return details with only data available from API
     return {
       schemeCode: schemeCode,
       schemeName: response.data.meta.scheme_name,
@@ -159,18 +158,12 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
       schemeType: response.data.meta.scheme_type,
       category: category,
       riskLevel: getRiskLevel(category),
-      expenseRatio: (Math.random() * 2 + 0.5).toFixed(2) + '%', // Mock data
-      aum: `₹${(Math.random() * 20000 + 1000).toFixed(2)} Cr`, // Mock data
       launchDate: estimateLaunchDate(navData),
-      fundManager: 'Experienced Fund Manager', // Mock data
-      exitLoad: '1% if redeemed within 1 year', // Mock data
       returns: {
         oneYear: oneYearReturn,
         threeYear: threeYearReturn,
         fiveYear: fiveYearReturn,
-      },
-      sectorAllocation: generateSectorAllocation(category),
-      portfolioHoldings: generatePortfolioHoldings(category),
+      }
     };
   } catch (error) {
     console.error('Error fetching fund details:', error);
@@ -227,57 +220,6 @@ function getRiskLevel(category: string): string {
     default:
       return 'Moderate';
   }
-}
-
-// Helper function to generate mock sector allocation based on fund category
-function generateSectorAllocation(category: string) {
-  if (category === 'Equity' || category === 'Hybrid' || category === 'ELSS' || category === 'Index') {
-    return [
-      { sector: 'Financial Services', allocation: 32.5 },
-      { sector: 'Technology', allocation: 18.7 },
-      { sector: 'Consumer Goods', allocation: 12.3 },
-      { sector: 'Automobile', allocation: 9.8 },
-      { sector: 'Healthcare', allocation: 8.4 },
-    ];
-  } else if (category === 'Debt') {
-    return [
-      { sector: 'Government Securities', allocation: 45.5 },
-      { sector: 'AAA Bonds', allocation: 28.7 },
-      { sector: 'AA+ Bonds', allocation: 15.3 },
-      { sector: 'Money Market', allocation: 10.5 },
-    ];
-  }
-  return [];
-}
-
-// Helper function to generate mock portfolio holdings based on fund category
-function generatePortfolioHoldings(category: string) {
-  if (category === 'Equity' || category === 'Hybrid' || category === 'ELSS') {
-    return [
-      { company: 'HDFC Bank Ltd', allocation: 8.7 },
-      { company: 'ICICI Bank Ltd', allocation: 7.2 },
-      { company: 'Reliance Industries Ltd', allocation: 6.5 },
-      { company: 'Infosys Ltd', allocation: 5.8 },
-      { company: 'TCS Ltd', allocation: 4.9 },
-    ];
-  } else if (category === 'Index') {
-    return [
-      { company: 'Reliance Industries Ltd', allocation: 10.2 },
-      { company: 'HDFC Bank Ltd', allocation: 9.8 },
-      { company: 'ICICI Bank Ltd', allocation: 8.3 },
-      { company: 'Infosys Ltd', allocation: 7.5 },
-      { company: 'TCS Ltd', allocation: 5.2 },
-    ];
-  } else if (category === 'Debt') {
-    return [
-      { company: 'Government of India', allocation: 45.5 },
-      { company: 'HDFC Ltd', allocation: 8.3 },
-      { company: 'SBI', allocation: 6.7 },
-      { company: 'LIC Housing Finance', allocation: 5.9 },
-      { company: 'Power Finance Corporation', allocation: 4.8 },
-    ];
-  }
-  return [];
 }
 
 const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {

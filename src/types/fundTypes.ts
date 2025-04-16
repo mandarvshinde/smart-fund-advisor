@@ -1,4 +1,3 @@
-
 // --- NEW: API Response Types ---
 export interface ApiFundBasicInfo {
   schemeCode: number; // API returns number
@@ -26,7 +25,7 @@ export interface ApiFundDetailsResponse {
 // --- End NEW ---
 
 
-// --- MODIFIED: Fund Type ---
+// --- Fund Type ---
 // Represents basic info, primarily from the /mf list endpoint
 export interface Fund {
   schemeCode: string; // Use string consistently
@@ -43,7 +42,7 @@ export interface Fund {
   };
 }
 
-// --- MODIFIED: FundDetails Type ---
+// --- FundDetails Type ---
 export interface FundDetails extends Fund {
   // Fields directly from API (/mf/{schemeCode})
   nav: string;         // Latest NAV (string)
@@ -51,21 +50,17 @@ export interface FundDetails extends Fund {
   fundHouse: string;
   schemeType?: string; // From API meta
   category: string;    // From API meta (scheme_category)
-
-  // Fields NOT directly from mfapi.in (Keep as mock/placeholders or remove)
-  riskLevel?: string;         // Mock/Placeholder
-  expenseRatio?: string;      // Mock/Placeholder
-  aum?: string;               // Mock/Placeholder
-  launchDate?: string;        // Mock/Placeholder
-  fundManager?: string;       // Mock/Placeholder
-  exitLoad?: string;          // Mock/Placeholder
-  returns?: {                 // Mock/Placeholder (Calculating requires NAV history analysis)
+  
+  // Derived fields
+  riskLevel?: string;
+  launchDate?: string;
+  
+  // Performance data calculated from historical NAVs
+  returns?: {
     oneYear?: number;
     threeYear?: number;
     fiveYear?: number;
   };
-  sectorAllocation?: { sector: string; allocation: number }[]; // Mock/Placeholder
-  portfolioHoldings?: { company: string; allocation: number }[]; // Mock/Placeholder
 }
 
 

@@ -6,18 +6,12 @@ import { toast } from 'sonner';
 import { 
   InfoIcon, 
   TrendingUp, 
-  BarChart3, 
-  PieChart, 
   Calendar, 
   DollarSign, 
-  Users, 
-  Clock, 
-  ArrowLeft,
-  ArrowUpRight,
-  MessageSquare,
+  MessageSquare, 
   Award,
   AlertCircle,
-  FileText,
+  ArrowLeft,
   Landmark
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +19,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
 import PageLayout from '@/components/layout/PageLayout';
 import { fetchFundDetails } from '@/services/fundService';
 import { FundDetails } from '@/types';
@@ -41,10 +34,12 @@ const FundDetail = () => {
     staleTime: 1000 * 60 * 15, // 15 minutes
     refetchOnWindowFocus: false,
     retry: 2,
-    onError: () => {
-      toast.error("Failed to load fund details. Please try again later.", {
-        duration: 5000,
-      });
+    onSettled: (data, error) => {
+      if (error) {
+        toast.error("Failed to load fund details. Please try again later.", {
+          duration: 5000,
+        });
+      }
     }
   });
   
@@ -69,7 +64,7 @@ const FundDetail = () => {
             <div>
               <h3 className="font-medium text-amber-800">Loading fund details</h3>
               <p className="text-sm text-amber-700">
-                Please be patient as we fetch real-time data from the mutual funds API. This may take a moment...
+                We're retrieving the latest data for this fund. This should only take a moment...
               </p>
             </div>
           </div>
@@ -181,10 +176,9 @@ const FundDetail = () => {
             </div>
             
             <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-4 mb-6">
+              <TabsList className="grid grid-cols-3 mb-6">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger value="portfolio">Holdings</TabsTrigger>
                 <TabsTrigger value="details">Fund Info</TabsTrigger>
               </TabsList>
               
@@ -202,45 +196,6 @@ const FundDetail = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="font-medium mb-2">Fund Metrics</h3>
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Expense Ratio (Regular)</span>
-                              <span className="font-medium">{fund.expenseRatio || '1.8%'}</span>
-                            </div>
-                            <Separator />
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Fund Size (AUM)</span>
-                              <span className="font-medium">{fund.aum || '₹5,238 Cr'}</span>
-                            </div>
-                            <Separator />
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Launch Date</span>
-                              <span className="font-medium">{fund.launchDate || '15 Jan 2013'}</span>
-                            </div>
-                            <Separator />
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Exit Load</span>
-                              <span className="font-medium">{fund.exitLoad || '1% if redeemed within 1 year'}</span>
-                            </div>
-                            <Separator />
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Min SIP Amount</span>
-                              <span className="font-medium">₹500</span>
-                            </div>
-                            <Separator />
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-500">Min Lumpsum</span>
-                              <span className="font-medium">₹5,000</span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
                     <div>
                       <h3 className="font-medium mb-2">Historical Returns</h3>
                       <Card>
@@ -286,49 +241,49 @@ const FundDetail = () => {
                         </CardContent>
                       </Card>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2">Investment Highlights</h3>
-                    <Card>
-                      <CardContent className="p-4 space-y-4">
-                        <div className="flex items-start">
-                          <div className="bg-blue-100 p-2 rounded-full mr-3">
-                            <Award className="h-5 w-5 text-blue-700" />
+
+                    <div>
+                      <h3 className="font-medium mb-2">Fund Highlights</h3>
+                      <Card>
+                        <CardContent className="p-4 space-y-4">
+                          <div className="flex items-start">
+                            <div className="bg-blue-100 p-2 rounded-full mr-3">
+                              <Award className="h-5 w-5 text-blue-700" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Fund Category</h4>
+                              <p className="text-sm text-gray-600">
+                                {fund.category} fund with {fund.riskLevel} risk profile
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-medium text-sm">Fund Performance</h4>
-                            <p className="text-sm text-gray-600">
-                              This fund has delivered consistent returns over the years, making it a preferred choice for long-term investors.
-                            </p>
+                          
+                          <div className="flex items-start">
+                            <div className="bg-green-100 p-2 rounded-full mr-3">
+                              <Calendar className="h-5 w-5 text-green-700" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Fund History</h4>
+                              <p className="text-sm text-gray-600">
+                                Launched on {fund.launchDate || 'NA'}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-start">
-                          <div className="bg-green-100 p-2 rounded-full mr-3">
-                            <Users className="h-5 w-5 text-green-700" />
+                          
+                          <div className="flex items-start">
+                            <div className="bg-amber-100 p-2 rounded-full mr-3">
+                              <TrendingUp className="h-5 w-5 text-amber-700" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Performance Trend</h4>
+                              <p className="text-sm text-gray-600">
+                                {(fund.returns?.oneYear || 0) > 15 ? 'Strong' : (fund.returns?.oneYear || 0) > 0 ? 'Positive' : 'Challenging'} performance over the past year
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-medium text-sm">Experienced Management</h4>
-                            <p className="text-sm text-gray-600">
-                              Managed by {fund.fundManager || 'experienced fund managers'} with a proven track record in the industry.
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start">
-                          <div className="bg-amber-100 p-2 rounded-full mr-3">
-                            <FileText className="h-5 w-5 text-amber-700" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-sm">Diversified Portfolio</h4>
-                            <p className="text-sm text-gray-600">
-                              Invests across various sectors and companies to optimize returns while managing risk.
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -341,49 +296,31 @@ const FundDetail = () => {
                       <CardContent className="p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div>
-                            <h4 className="text-sm font-medium mb-4">Returns Comparison (%)</h4>
+                            <h4 className="text-sm font-medium mb-4">Returns (%)</h4>
                             <div className="space-y-4">
-                              <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>1 Month</span>
-                                  <span className={`${Math.random() > 0.5 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {(Math.random() * 5 - 2).toFixed(2)}%
-                                  </span>
-                                </div>
-                                <Progress value={Math.random() * 100} className="h-1.5" />
-                              </div>
-                              <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>6 Months</span>
-                                  <span className={`${Math.random() > 0.3 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {(Math.random() * 15 - 3).toFixed(2)}%
-                                  </span>
-                                </div>
-                                <Progress value={Math.random() * 100} className="h-1.5" />
-                              </div>
                               <div>
                                 <div className="flex justify-between text-sm mb-1">
                                   <span>1 Year</span>
                                   <span className={`${(fund.returns?.oneYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.oneYear ? `${fund.returns.oneYear.toFixed(2)}%` : '0.00%'}
+                                    {fund.returns?.oneYear ? `${fund.returns.oneYear.toFixed(2)}%` : 'NA'}
                                   </span>
                                 </div>
                                 <Progress value={Math.min(Math.abs(fund.returns?.oneYear || 0) * 2, 100)} className="h-1.5" />
                               </div>
                               <div>
                                 <div className="flex justify-between text-sm mb-1">
-                                  <span>3 Years</span>
+                                  <span>3 Years (CAGR)</span>
                                   <span className={`${(fund.returns?.threeYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.threeYear ? `${fund.returns.threeYear.toFixed(2)}%` : '0.00%'}
+                                    {fund.returns?.threeYear ? `${fund.returns.threeYear.toFixed(2)}%` : 'NA'}
                                   </span>
                                 </div>
                                 <Progress value={Math.min(Math.abs(fund.returns?.threeYear || 0), 100)} className="h-1.5" />
                               </div>
                               <div>
                                 <div className="flex justify-between text-sm mb-1">
-                                  <span>5 Years</span>
+                                  <span>5 Years (CAGR)</span>
                                   <span className={`${(fund.returns?.fiveYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                                    {fund.returns?.fiveYear ? `${fund.returns.fiveYear.toFixed(2)}%` : '0.00%'}
+                                    {fund.returns?.fiveYear ? `${fund.returns.fiveYear.toFixed(2)}%` : 'NA'}
                                   </span>
                                 </div>
                                 <Progress value={Math.min(Math.abs(fund.returns?.fiveYear || 0), 100)} className="h-1.5" />
@@ -396,30 +333,10 @@ const FundDetail = () => {
                             <div className="bg-gray-50 p-4 rounded">
                               <p className="text-gray-500 text-sm mb-4">Benchmark: {fund.category === 'Equity' ? 'Nifty 50' : fund.category === 'Debt' ? 'CRISIL Composite Bond Fund Index' : 'S&P BSE 200 TRI'}</p>
                               
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-3 text-xs">
-                                  <div>Duration</div>
-                                  <div className="text-center">Fund (%)</div>
-                                  <div className="text-center">Benchmark (%)</div>
-                                </div>
-                                
-                                <div className="grid grid-cols-3 items-center text-sm">
-                                  <div>1 Year</div>
-                                  <div className={`text-center ${(fund.returns?.oneYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>{fund.returns?.oneYear ? fund.returns.oneYear.toFixed(2) : 'NA'}</div>
-                                  <div className="text-center">{(Math.random() * 20 - 5).toFixed(2)}</div>
-                                </div>
-                                
-                                <div className="grid grid-cols-3 items-center text-sm">
-                                  <div>3 Years</div>
-                                  <div className={`text-center ${(fund.returns?.threeYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>{fund.returns?.threeYear ? fund.returns.threeYear.toFixed(2) : 'NA'}</div>
-                                  <div className="text-center">{(Math.random() * 30).toFixed(2)}</div>
-                                </div>
-                                
-                                <div className="grid grid-cols-3 items-center text-sm">
-                                  <div>5 Years</div>
-                                  <div className={`text-center ${(fund.returns?.fiveYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>{fund.returns?.fiveYear ? fund.returns.fiveYear.toFixed(2) : 'NA'}</div>
-                                  <div className="text-center">{(Math.random() * 50).toFixed(2)}</div>
-                                </div>
+                              <div className="flex items-center justify-center p-8">
+                                <p className="text-sm text-gray-600">
+                                  Benchmark comparison data not available from API
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -438,7 +355,7 @@ const FundDetail = () => {
                             <div className="grid grid-cols-3 text-xs border-b pb-2 mb-2">
                               <div>Duration</div>
                               <div>Investment</div>
-                              <div>Current Value</div>
+                              <div>Current Value*</div>
                             </div>
                             
                             <div className="space-y-2">
@@ -460,6 +377,7 @@ const FundDetail = () => {
                                 <div className="font-medium">₹{Math.round(600000 * (1 + (fund.returns?.fiveYear || 50) / 100)).toLocaleString('en-IN')}</div>
                               </div>
                             </div>
+                            <p className="text-xs text-gray-500 mt-2">*Estimated based on current returns. Not guaranteed.</p>
                           </div>
                           
                           <div className="bg-gray-50 p-4 rounded">
@@ -467,7 +385,7 @@ const FundDetail = () => {
                             <div className="grid grid-cols-3 text-xs border-b pb-2 mb-2">
                               <div>Duration</div>
                               <div>Investment</div>
-                              <div>Current Value</div>
+                              <div>Current Value*</div>
                             </div>
                             
                             <div className="space-y-2">
@@ -489,134 +407,7 @@ const FundDetail = () => {
                                 <div className="font-medium">₹{Math.round(10000 * Math.pow(1 + (fund.returns?.fiveYear || 50) / 100, 5)).toLocaleString('en-IN')}</div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="portfolio">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="font-medium mb-2">Sector Allocation</h3>
-                      <Card>
-                        <CardContent className="p-4">
-                          {fund.sectorAllocation ? (
-                            <div className="space-y-3">
-                              {fund.sectorAllocation.map((item, index) => (
-                                <div key={index}>
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>{item.sector}</span>
-                                    <span className="font-medium">{item.allocation.toFixed(1)}%</span>
-                                  </div>
-                                  <Progress value={item.allocation} className="h-1.5" />
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="text-center py-6">
-                              <PieChart className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                              <p className="text-sm text-gray-500">Sector allocation data not available</p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium mb-2">Top Holdings</h3>
-                      <Card>
-                        <CardContent className="p-4">
-                          {fund.portfolioHoldings ? (
-                            <div className="space-y-3">
-                              {fund.portfolioHoldings.map((item, index) => (
-                                <div key={index}>
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>{item.company}</span>
-                                    <span className="font-medium">{item.allocation.toFixed(1)}%</span>
-                                  </div>
-                                  <Progress value={item.allocation * 5} className="h-1.5" />
-                                </div>
-                              ))}
-                              <div className="mt-4 text-right">
-                                <p className="text-xs text-gray-500">
-                                  Total of top 5 holdings: {fund.portfolioHoldings.reduce((sum, item) => sum + item.allocation, 0).toFixed(1)}%
-                                </p>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-center py-6">
-                              <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                              <p className="text-sm text-gray-500">Holdings data not available</p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2">Portfolio Overview</h3>
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <h4 className="text-sm font-medium mb-3">Asset Allocation</h4>
-                            <div className="bg-gray-50 p-4 rounded">
-                              <div className="space-y-3">
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>Equity</span>
-                                  <span className="font-medium">{fund.category === 'Equity' ? '95.8%' : fund.category === 'Hybrid' ? '65.3%' : '0%'}</span>
-                                </div>
-                                <Progress value={fund.category === 'Equity' ? 95.8 : fund.category === 'Hybrid' ? 65.3 : 0} className="h-1.5" />
-                                
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>Debt</span>
-                                  <span className="font-medium">{fund.category === 'Debt' ? '97.2%' : fund.category === 'Hybrid' ? '30.5%' : '0%'}</span>
-                                </div>
-                                <Progress value={fund.category === 'Debt' ? 97.2 : fund.category === 'Hybrid' ? 30.5 : 0} className="h-1.5" />
-                                
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span>Cash & Equivalents</span>
-                                  <span className="font-medium">{fund.category === 'Equity' ? '4.2%' : fund.category === 'Debt' ? '2.8%' : fund.category === 'Hybrid' ? '4.2%' : '0%'}</span>
-                                </div>
-                                <Progress value={fund.category === 'Equity' ? 4.2 : fund.category === 'Debt' ? 2.8 : fund.category === 'Hybrid' ? 4.2 : 0} className="h-1.5" />
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h4 className="text-sm font-medium mb-3">Market Cap Allocation</h4>
-                            <div className="bg-gray-50 p-4 rounded">
-                              {fund.category === 'Equity' || fund.category === 'Hybrid' ? (
-                                <div className="space-y-3">
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Large Cap</span>
-                                    <span className="font-medium">58.5%</span>
-                                  </div>
-                                  <Progress value={58.5} className="h-1.5" />
-                                  
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Mid Cap</span>
-                                    <span className="font-medium">28.3%</span>
-                                  </div>
-                                  <Progress value={28.3} className="h-1.5" />
-                                  
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Small Cap</span>
-                                    <span className="font-medium">13.2%</span>
-                                  </div>
-                                  <Progress value={13.2} className="h-1.5" />
-                                </div>
-                              ) : (
-                                <div className="text-center py-6">
-                                  <p className="text-sm text-gray-500">Not applicable for this fund type</p>
-                                </div>
-                              )}
-                            </div>
+                            <p className="text-xs text-gray-500 mt-2">*Estimated based on current returns. Not guaranteed.</p>
                           </div>
                         </div>
                       </CardContent>
@@ -663,23 +454,8 @@ const FundDetail = () => {
                           </div>
                           
                           <div className="flex justify-between py-2 border-b">
-                            <span className="text-sm text-gray-500">Fund Manager</span>
-                            <span className="text-sm font-medium text-right">{fund.fundManager || 'NA'}</span>
-                          </div>
-                          
-                          <div className="flex justify-between py-2 border-b">
-                            <span className="text-sm text-gray-500">AUM</span>
-                            <span className="text-sm font-medium text-right">{fund.aum || 'NA'}</span>
-                          </div>
-                          
-                          <div className="flex justify-between py-2 border-b">
-                            <span className="text-sm text-gray-500">Expense Ratio</span>
-                            <span className="text-sm font-medium text-right">{fund.expenseRatio || 'NA'}</span>
-                          </div>
-                          
-                          <div className="flex justify-between py-2 border-b">
-                            <span className="text-sm text-gray-500">Exit Load</span>
-                            <span className="text-sm font-medium text-right">{fund.exitLoad || 'NA'}</span>
+                            <span className="text-sm text-gray-500">Risk Level</span>
+                            <span className="text-sm font-medium text-right">{fund.riskLevel}</span>
                           </div>
                           
                           <div className="flex justify-between py-2 border-b">
@@ -705,11 +481,6 @@ const FundDetail = () => {
                           <div className="flex justify-between py-2 border-b">
                             <span className="text-sm text-gray-500">SIP Dates</span>
                             <span className="text-sm font-medium text-right">1st, 5th, 10th, 15th, 20th, 25th</span>
-                          </div>
-                          
-                          <div className="flex justify-between py-2 border-b">
-                            <span className="text-sm text-gray-500">SWP/STP</span>
-                            <span className="text-sm font-medium text-right">Available</span>
                           </div>
                         </div>
                         
@@ -737,8 +508,7 @@ const FundDetail = () => {
                               {fund.fundHouse || 'This asset management company'} is registered with SEBI and offers a range of mutual fund schemes catering to diverse investor needs.
                             </p>
                             <Button variant="outline" size="sm" className="mt-3">
-                              <ArrowUpRight className="h-4 w-4 mr-1" />
-                              Visit AMC Website
+                              Contact Advisor
                             </Button>
                           </div>
                         </div>

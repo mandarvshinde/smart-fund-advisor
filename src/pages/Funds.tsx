@@ -24,10 +24,12 @@ const Funds = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,
-    onError: () => {
-      toast.error("Failed to load funds. Please try again later.", {
-        duration: 5000,
-      });
+    onSettled: (data, error) => {
+      if (error) {
+        toast.error("Failed to load funds. Please try again later.", {
+          duration: 5000,
+        });
+      }
     }
   });
 
@@ -59,9 +61,9 @@ const Funds = () => {
             <div className="flex gap-3">
               <AlertCircle className="h-5 w-5 text-amber-500" />
               <div>
-                <h3 className="font-medium text-amber-800">Loading funds from mfapi.in</h3>
+                <h3 className="font-medium text-amber-800">Loading funds</h3>
                 <p className="text-sm text-amber-700">
-                  Please be patient as we fetch real-time data from the mutual funds API. This may take a moment...
+                  We're fetching the latest mutual fund data. This usually takes just a moment...
                 </p>
               </div>
             </div>
