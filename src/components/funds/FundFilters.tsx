@@ -1,10 +1,6 @@
 
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
+import React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -12,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 
 interface FundFiltersProps {
   activeCategory: string;
@@ -20,42 +17,92 @@ interface FundFiltersProps {
   onSortChange: (sortBy: string) => void;
 }
 
-export const FundFilters = ({ 
-  activeCategory, 
+export const FundFilters = ({
+  activeCategory,
   onCategoryChange,
   activeSortBy,
-  onSortChange
+  onSortChange,
 }: FundFiltersProps) => {
   return (
     <div className="space-y-4">
-      <Tabs defaultValue={activeCategory} onValueChange={onCategoryChange} className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
-          <TabsTrigger value="all">All Funds</TabsTrigger>
-          <TabsTrigger value="equity">Equity</TabsTrigger>
-          <TabsTrigger value="debt">Debt</TabsTrigger>
-          <TabsTrigger value="hybrid">Hybrid</TabsTrigger>
-          <TabsTrigger value="other">Other</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="text-sm text-gray-600">
-          Showing <span className="font-semibold">Mutual Funds</span> based on your preferences
+      <div className="flex flex-col sm:flex-row gap-4 justify-between">
+        <div>
+          <h3 className="text-sm font-medium mb-2 text-gray-700">Fund Category</h3>
+          <div className="flex flex-wrap gap-2">
+            <CategoryButton
+              isActive={activeCategory === "all"}
+              onClick={() => onCategoryChange("all")}
+            >
+              All Funds
+            </CategoryButton>
+            <CategoryButton
+              isActive={activeCategory === "equity"}
+              onClick={() => onCategoryChange("equity")}
+            >
+              Equity
+            </CategoryButton>
+            <CategoryButton
+              isActive={activeCategory === "debt"}
+              onClick={() => onCategoryChange("debt")}
+            >
+              Debt
+            </CategoryButton>
+            <CategoryButton
+              isActive={activeCategory === "hybrid"}
+              onClick={() => onCategoryChange("hybrid")}
+            >
+              Hybrid
+            </CategoryButton>
+            <CategoryButton
+              isActive={activeCategory === "index"}
+              onClick={() => onCategoryChange("index")}
+            >
+              Index
+            </CategoryButton>
+            <CategoryButton
+              isActive={activeCategory === "elss"}
+              onClick={() => onCategoryChange("elss")}
+            >
+              ELSS (Tax Saving)
+            </CategoryButton>
+          </div>
         </div>
-        
-        <Select value={activeSortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="returns">1Y Returns (High to Low)</SelectItem>
-            <SelectItem value="returns-asc">1Y Returns (Low to High)</SelectItem>
-            <SelectItem value="nav">NAV (High to Low)</SelectItem>
-            <SelectItem value="nav-asc">NAV (Low to High)</SelectItem>
-            <SelectItem value="alpha">Alphabetical (A-Z)</SelectItem>
-          </SelectContent>
-        </Select>
+
+        <div className="min-w-36">
+          <h3 className="text-sm font-medium mb-2 text-gray-700">Sort By</h3>
+          <Select value={activeSortBy} onValueChange={onSortChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="returns">Highest Returns</SelectItem>
+              <SelectItem value="returns-asc">Lowest Returns</SelectItem>
+              <SelectItem value="nav">Highest NAV</SelectItem>
+              <SelectItem value="nav-asc">Lowest NAV</SelectItem>
+              <SelectItem value="alpha">Fund Name (A-Z)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
+  );
+};
+
+interface CategoryButtonProps {
+  isActive: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+
+const CategoryButton = ({ isActive, onClick, children }: CategoryButtonProps) => {
+  return (
+    <Button
+      variant={isActive ? "default" : "outline"}
+      size="sm"
+      onClick={onClick}
+      className={isActive ? "bg-[#8D6E63] hover:bg-[#6D4C41]" : ""}
+    >
+      {children}
+    </Button>
   );
 };

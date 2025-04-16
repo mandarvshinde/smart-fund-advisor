@@ -1,71 +1,284 @@
 
-import { Fund, FundDetails } from '@/types';
-import { fetchMutualFunds } from '@/services/mockData';
+import { Fund, FundDetails, ApiFundBasicInfo, ApiFundDetailsResponse } from '@/types';
+import axios from 'axios';
 
-// In a real app, we would fetch this data from mfapi.com
-// For demo purposes, we're using mock data and simulating API calls
+const MFAPI_BASE_URL = 'https://api.mfapi.in';
 
+// Get list of all mutual funds
 export const fetchFundsList = async (category: string, sortBy: string): Promise<Fund[]> => {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Get funds from mockData
-  const mockFunds = fetchMutualFunds();
-  
-  // Filter by category if needed
-  let filteredFunds = [...mockFunds];
-  if (category !== 'all') {
-    filteredFunds = mockFunds.filter(fund => fund.category?.toLowerCase() === category);
+  try {
+    // Fetch all mutual funds list from mfapi.in
+    const response = await axios.get<ApiFundBasicInfo[]>(`${MFAPI_BASE_URL}/mf`);
+    const funds = response.data;
+    
+    // Transform API data to our Fund type
+    let transformedFunds: Fund[] = await Promise.all(
+      // Limit to 100 funds to avoid too many requests
+      funds.slice(0, 100).map(async (fund) => {
+        try {
+          // Get basic details for each fund to get NAV and date
+          const detailsResponse = await axios.get<ApiFundDetailsResponse>(
+            `${MFAPI_BASE_URL}/mf/${fund.schemeCode}`
+          );
+          
+          // Get the latest NAV data (first item in data array)
+          const latestNav = detailsResponse.data.data[0];
+          
+          // Derive category from scheme name (simplified)
+          let category = 'Other';
+          const name = fund.schemeName.toLowerCase();
+          if (name.includes('equity') || name.includes('growth')) {
+            category = 'Equity';
+          } else if (name.includes('debt') || name.includes('income') || name.includes('liquid')) {
+            category = 'Debt';
+          } else if (name.includes('hybrid') || name.includes('balanced')) {
+            category = 'Hybrid';
+          } else if (name.includes('index') || name.includes('nifty') || name.includes('sensex')) {
+            category = 'Index';
+          } else if (name.includes('tax') || name.includes('elss')) {
+            category = 'ELSS';
+          }
+          
+          // Determine if it's a direct or regular fund
+          const isDirectPlan = name.includes('direct');
+          
+          // Only include regular plans (not direct plans)
+          if (!isDirectPlan) {
+            return {
+              schemeCode: fund.schemeCode.toString(),
+              schemeName: fund.schemeName,
+              nav: latestNav.nav,
+              date: latestNav.date,
+              fundHouse: detailsResponse.data.meta.fund_house,
+              category: category,
+              returns: {
+                // Note: These are mock returns as the API doesn't provide them
+                // In a real app, you'd calculate these from historical NAV data
+                oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
+                threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
+                fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
+              }
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error(`Error fetching details for fund ${fund.schemeCode}:`, error);
+          return null;
+        }
+      })
+    );
+    
+    // Filter out null values (direct plans and failed requests)
+    transformedFunds = transformedFunds.filter(fund => fund !== null) as Fund[];
+    
+    // Filter by category if needed
+    if (category !== 'all') {
+      transformedFunds = transformedFunds.filter(fund => 
+        fund.category?.toLowerCase() === category.toLowerCase()
+      );
+    }
+    
+    // Sort the data based on sortBy parameter
+    return sortFunds(transformedFunds, sortBy);
+  } catch (error) {
+    console.error('Error fetching mutual funds list:', error);
+    return [];
   }
-  
-  // Sort the data based on sortBy parameter
-  return sortFunds(filteredFunds, sortBy);
 };
 
 export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails | null> => {
-  // Simulate API call to mfapi.com/mf/{schemeCode}
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  try {
+    // Fetch fund details from the API
+    const response = await axios.get<ApiFundDetailsResponse>(
+      `${MFAPI_BASE_URL}/mf/${schemeCode}`
+    );
+    
+    if (!response.data || !response.data.data || response.data.data.length === 0) {
+      return null;
+    }
+    
+    // Get the latest NAV data (first item in data array)
+    const latestNav = response.data.data[0];
+    
+    // Get historical NAV data for calculating returns
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    
+    const threeYearsAgo = new Date();
+    threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+    
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    
+    // Find NAV values from approximately 1, 3, and 5 years ago
+    // Note: This is a simplified approach to calculate returns
+    const navData = response.data.data;
+    const currentNAV = parseFloat(latestNav.nav);
+    
+    // Calculate 1-year returns
+    const oneYearIndex = findClosestDateIndex(navData, oneYearAgo);
+    const oneYearOldNAV = oneYearIndex >= 0 ? parseFloat(navData[oneYearIndex].nav) : null;
+    const oneYearReturn = oneYearOldNAV ? ((currentNAV - oneYearOldNAV) / oneYearOldNAV) * 100 : null;
+    
+    // Calculate 3-year returns (annualized)
+    const threeYearIndex = findClosestDateIndex(navData, threeYearsAgo);
+    const threeYearOldNAV = threeYearIndex >= 0 ? parseFloat(navData[threeYearIndex].nav) : null;
+    const threeYearReturn = threeYearOldNAV 
+      ? (Math.pow((currentNAV / threeYearOldNAV), 1/3) - 1) * 100 
+      : null;
+    
+    // Calculate 5-year returns (annualized)
+    const fiveYearIndex = findClosestDateIndex(navData, fiveYearsAgo);
+    const fiveYearOldNAV = fiveYearIndex >= 0 ? parseFloat(navData[fiveYearIndex].nav) : null;
+    const fiveYearReturn = fiveYearOldNAV 
+      ? (Math.pow((currentNAV / fiveYearOldNAV), 1/5) - 1) * 100 
+      : null;
+    
+    // Derive category from scheme name (simplified)
+    let category = 'Other';
+    const name = response.data.meta.scheme_name.toLowerCase();
+    if (name.includes('equity') || name.includes('growth')) {
+      category = 'Equity';
+    } else if (name.includes('debt') || name.includes('income') || name.includes('liquid')) {
+      category = 'Debt';
+    } else if (name.includes('hybrid') || name.includes('balanced')) {
+      category = 'Hybrid';
+    } else if (name.includes('index') || name.includes('nifty') || name.includes('sensex')) {
+      category = 'Index';
+    } else if (name.includes('tax') || name.includes('elss')) {
+      category = 'ELSS';
+    }
+    
+    // Return enhanced details
+    return {
+      schemeCode: schemeCode,
+      schemeName: response.data.meta.scheme_name,
+      nav: latestNav.nav,
+      date: latestNav.date,
+      fundHouse: response.data.meta.fund_house,
+      schemeType: response.data.meta.scheme_type,
+      category: category,
+      riskLevel: getRiskLevel(category),
+      expenseRatio: (Math.random() * 2 + 0.5).toFixed(2) + '%', // Mock data
+      aum: `₹${(Math.random() * 20000 + 1000).toFixed(2)} Cr`, // Mock data
+      launchDate: estimateLaunchDate(navData),
+      fundManager: 'Experienced Fund Manager', // Mock data
+      exitLoad: '1% if redeemed within 1 year', // Mock data
+      returns: {
+        oneYear: oneYearReturn,
+        threeYear: threeYearReturn,
+        fiveYear: fiveYearReturn,
+      },
+      sectorAllocation: generateSectorAllocation(category),
+      portfolioHoldings: generatePortfolioHoldings(category),
+    };
+  } catch (error) {
+    console.error('Error fetching fund details:', error);
+    return null;
+  }
+};
+
+// Helper function to find the closest date index in NAV data
+function findClosestDateIndex(navData: { date: string; nav: string }[], targetDate: Date): number {
+  const targetTime = targetDate.getTime();
   
-  // Find the fund in our mock data
-  const mockFunds = fetchMutualFunds();
-  const fund = mockFunds.find(f => f.schemeCode === schemeCode);
+  let closestIndex = -1;
+  let closestDiff = Number.MAX_SAFE_INTEGER;
   
-  if (!fund) return null;
+  navData.forEach((dataPoint, index) => {
+    // Parse the date string (DD-MM-YYYY) to a Date object
+    const dateParts = dataPoint.date.split('-');
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed in JS Date
+    const day = parseInt(dateParts[0]);
+    
+    const dataPointDate = new Date(year, month, day);
+    const diff = Math.abs(dataPointDate.getTime() - targetTime);
+    
+    if (diff < closestDiff) {
+      closestDiff = diff;
+      closestIndex = index;
+    }
+  });
   
-  // Return enhanced details (in a real app, this would come from the API)
-  return {
-    ...fund,
-    nav: fund.nav || (Math.random() * 100 + 10).toFixed(2), // Ensure 'nav' is included
-    riskLevel: ['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)],
-    expenseRatio: (Math.random() * 2 + 0.5).toFixed(2),
-    aum: `₹${(Math.random() * 20000 + 1000).toFixed(2)} Cr`,
-    launchDate: '12-06-2010',
-    fundManager: 'Experienced Fund Manager',
-    exitLoad: '1% if redeemed within 1 year',
-    returns: fund.returns || {
-      oneYear: (Math.random() * 30 - 5),
-      threeYear: (Math.random() * 40 + 5),
-      fiveYear: (Math.random() * 60 + 10),
-    },
-    sectorAllocation: [
+  return closestIndex;
+}
+
+// Helper function to estimate launch date from NAV data
+function estimateLaunchDate(navData: { date: string; nav: string }[]): string {
+  // The oldest data point should be close to the launch date
+  const oldestDataPoint = navData[navData.length - 1];
+  return oldestDataPoint ? oldestDataPoint.date : 'NA';
+}
+
+// Helper function to get risk level based on category
+function getRiskLevel(category: string): string {
+  switch (category) {
+    case 'Equity':
+      return 'High';
+    case 'Hybrid':
+      return 'Moderate';
+    case 'Debt':
+      return 'Low';
+    case 'ELSS':
+      return 'High';
+    case 'Index':
+      return 'Moderate to High';
+    default:
+      return 'Moderate';
+  }
+}
+
+// Helper function to generate mock sector allocation based on fund category
+function generateSectorAllocation(category: string) {
+  if (category === 'Equity' || category === 'Hybrid' || category === 'ELSS' || category === 'Index') {
+    return [
       { sector: 'Financial Services', allocation: 32.5 },
       { sector: 'Technology', allocation: 18.7 },
       { sector: 'Consumer Goods', allocation: 12.3 },
       { sector: 'Automobile', allocation: 9.8 },
       { sector: 'Healthcare', allocation: 8.4 },
-    ],
-    portfolioHoldings: [
+    ];
+  } else if (category === 'Debt') {
+    return [
+      { sector: 'Government Securities', allocation: 45.5 },
+      { sector: 'AAA Bonds', allocation: 28.7 },
+      { sector: 'AA+ Bonds', allocation: 15.3 },
+      { sector: 'Money Market', allocation: 10.5 },
+    ];
+  }
+  return [];
+}
+
+// Helper function to generate mock portfolio holdings based on fund category
+function generatePortfolioHoldings(category: string) {
+  if (category === 'Equity' || category === 'Hybrid' || category === 'ELSS') {
+    return [
       { company: 'HDFC Bank Ltd', allocation: 8.7 },
       { company: 'ICICI Bank Ltd', allocation: 7.2 },
       { company: 'Reliance Industries Ltd', allocation: 6.5 },
       { company: 'Infosys Ltd', allocation: 5.8 },
       { company: 'TCS Ltd', allocation: 4.9 },
-    ],
-    fundHouse: fund.fundHouse || 'Default Fund House', // Add the required 'fundHouse' property
-    date: new Date().toISOString(), // Add the required 'date' property
-    category: fund.category || 'Uncategorized' // Ensure 'category' is always included
-  };
-};
+    ];
+  } else if (category === 'Index') {
+    return [
+      { company: 'Reliance Industries Ltd', allocation: 10.2 },
+      { company: 'HDFC Bank Ltd', allocation: 9.8 },
+      { company: 'ICICI Bank Ltd', allocation: 8.3 },
+      { company: 'Infosys Ltd', allocation: 7.5 },
+      { company: 'TCS Ltd', allocation: 5.2 },
+    ];
+  } else if (category === 'Debt') {
+    return [
+      { company: 'Government of India', allocation: 45.5 },
+      { company: 'HDFC Ltd', allocation: 8.3 },
+      { company: 'SBI', allocation: 6.7 },
+      { company: 'LIC Housing Finance', allocation: 5.9 },
+      { company: 'Power Finance Corporation', allocation: 4.8 },
+    ];
+  }
+  return [];
+}
 
 const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {
   const sortedFunds = [...funds];

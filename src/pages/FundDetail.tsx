@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { 
   InfoIcon, 
   TrendingUp, 
@@ -24,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import PageLayout from '@/components/layout/PageLayout';
 import { fetchFundDetails } from '@/services/fundService';
 import { FundDetails } from '@/types';
@@ -36,6 +38,14 @@ const FundDetail = () => {
     queryKey: ['fund-details', schemeCode],
     queryFn: () => fetchFundDetails(schemeCode || ''),
     enabled: !!schemeCode,
+    staleTime: 1000 * 60 * 15, // 15 minutes
+    refetchOnWindowFocus: false,
+    retry: 2,
+    onError: () => {
+      toast.error("Failed to load fund details. Please try again later.", {
+        duration: 5000,
+      });
+    }
   });
   
   useEffect(() => {
@@ -53,6 +63,17 @@ const FundDetail = () => {
   if (isLoading) {
     return (
       <PageLayout title="Loading Fund Details..." subtitle="Please wait while we fetch the fund information">
+        <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
+          <div className="flex gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <div>
+              <h3 className="font-medium text-amber-800">Loading fund details</h3>
+              <p className="text-sm text-amber-700">
+                Please be patient as we fetch real-time data from the mutual funds API. This may take a moment...
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="grid gap-6">
           <Card>
             <CardHeader className="pb-3">
