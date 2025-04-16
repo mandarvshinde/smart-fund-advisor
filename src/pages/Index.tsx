@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight, Shield, TrendingUp, Target, BarChart3, Calculator, MessageSquare, CheckCircle, LockKeyhole, DollarSign, Users, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import Footer from '@/components/layout/Footer';
+import { PopularFunds } from '@/components/dashboard/PopularFunds';
 
 const Index = () => {
   const { isLoading, user } = useUser();
@@ -289,6 +289,15 @@ const Index = () => {
               <p className="text-sm text-gray-600">Tailored to your financial goals</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gradient-to-r from-[#EFEBE9] to-[#FEF7CD]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8 text-[#5D4037]">
+            Explore Popular Mutual Funds
+          </h2>
+          <PopularFunds />
         </div>
       </section>
 
