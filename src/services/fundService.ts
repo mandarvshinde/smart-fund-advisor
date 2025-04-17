@@ -2,12 +2,11 @@ import { Fund, FundDetails } from '@/types/fundTypes';
 import axios from 'axios';
 
 const AMFI_DATA_URL = 'https://www.amfiindia.com/spages/NAVAll.TXT';
-const TRADEFEEDS_API_URL = 'https://api.tradefeeds.com'; // Replace with actual Tradefeeds API URL
+const MFAPI_BASE_URL = 'https://api.mfapi.in/v1/mf'; // Base URL for MFAPI.in
 
-// Cache for AMFI data and Tradefeeds data
-let cachedAmfiData: Map<string, any> = new Map();
+// Cache for AMFI data and MFAPI data
+let cachedAmfiData: Fund[] | null = null;
 let lastAmfiFetchTime = 0;
-let parsedFunds: Fund[] = [];
 
 // Parse AMFI data into structured data
 const parseAmfiData = (data: string): Fund[] => {
@@ -54,7 +53,7 @@ const parseAmfiData = (data: string): Fund[] => {
           fundHouse: currentFundHouse,
           category,
           returns: {
-            oneYear: 10, // Default value, will be overwritten by Tradefeeds data
+            oneYear: 10, // Default value, will be overwritten by MFAPI data
             threeYear: 12,
             fiveYear: 14
           }
@@ -80,60 +79,67 @@ const determineFundCategory = (schemeName: string, schemeType: string): string =
 
 // Fetch AMFI data
 const fetchAmfiData = async (): Promise<Fund[]> => {
-  try {
-    const now = Date.now();
-    if (parsedFunds.length > 0 && now - lastAmfiFetchTime < 15 * 60 * 1000) {
-      return parsedFunds;
-    }
+  const now = Date.now();
+  if (cachedAmfiData && now - lastAmfiFetchTime < 15 * 60 * 1000) {
+    return cachedAmfiData; // Return cached data if less than 15 minutes
+  }
 
+  try {
     console.log('Fetching fresh AMFI data...');
     const response = await axios.get(AMFI_DATA_URL, { responseType: 'text' });
-    parsedFunds = parseAmfiData(response.data);
+    cachedAmfiData = parseAmfiData(response.data);
     lastAmfiFetchTime = now;
-
-    return parsedFunds;
+    return cachedAmfiData;
   } catch (error) {
     console.error('Error fetching AMFI data:', error);
     return [];
   }
 };
 
-// Fetch Tradefeeds data (Fund Performance, Holdings, Risk, Fees, Sector Allocation)
-const fetchTradefeedsData = async (schemeCode: string): Promise<any> => {
+// Fetch MFAPI data (Performance, Holdings, Sector Allocation, etc.)
+const fetchMfapiData = async (schemeCode: string): Promise<any> => {
   try {
-    const response = await axios.get(`${TRADEFEEDS_API_URL}/funds/${schemeCode}`);
-    return response.data; // Assuming it returns the required data
+    // Fetch performance data
+    const [performanceResponse, holdingsResponse, sectorAllocationResponse] = await Promise.all([
+      axios.get(`${MFAPI_BASE_URL}/${schemeCode}/performance`),
+      axios.get(`${MFAPI_BASE_URL}/${schemeCode}/holdings`),
+      axios.get(`${MFAPI_BASE_URL}/${schemeCode}/sector-allocation`),
+    ]);
+
+    return {
+      performance: performanceResponse.data,
+      holdings: holdingsResponse.data,
+      sectorAllocation: sectorAllocationResponse.data,
+    };
   } catch (error) {
-    console.error(`Error fetching data for scheme ${schemeCode} from Tradefeeds:`, error);
+    console.error(`Error fetching data for scheme ${schemeCode} from MFAPI:`, error);
     return null;
   }
 };
 
-// Combine AMFI and Tradefeeds data
+// Combine AMFI and MFAPI data
 const combineData = async (): Promise<Fund[]> => {
   const funds = await fetchAmfiData();
 
   const combinedFunds = await Promise.all(
     funds.map(async (fund) => {
-      const tradefeedsData = await fetchTradefeedsData(fund.schemeCode);
+      const mfapiData = await fetchMfapiData(fund.schemeCode);
 
-      if (tradefeedsData) {
-        // Combine AMFI data with Tradefeeds data
+      if (mfapiData) {
+        // Combine AMFI data with MFAPI data
         return {
           ...fund,
           returns: {
-            oneYear: tradefeedsData.performance.oneYear || fund.returns.oneYear,
-            threeYear: tradefeedsData.performance.threeYear || fund.returns.threeYear,
-            fiveYear: tradefeedsData.performance.fiveYear || fund.returns.fiveYear
+            oneYear: mfapiData.performance.oneYear || fund.returns.oneYear,
+            threeYear: mfapiData.performance.threeYear || fund.returns.threeYear,
+            fiveYear: mfapiData.performance.fiveYear || fund.returns.fiveYear
           },
-          holdings: tradefeedsData.holdings,
-          riskData: tradefeedsData.riskData,
-          fees: tradefeedsData.fees,
-          sectorAllocation: tradefeedsData.sectorAllocation
+          holdings: mfapiData.holdings,
+          sectorAllocation: mfapiData.sectorAllocation
         };
       }
 
-      return fund; // If Tradefeeds data is unavailable, return AMFI data as fallback
+      return fund; // If MFAPI data is unavailable, return AMFI data as fallback
     })
   );
 
