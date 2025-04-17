@@ -63,21 +63,21 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom financial app colors - updated to vibrant scheme
+				// Custom financial app colors - updated to Wealthfront-inspired scheme
 				finance: {
-					primary: '#6366f1', // Indigo
-					secondary: '#8b5cf6', // Purple
-					accent: '#06b6d4', // Cyan
-					muted: '#f3f4f6',
-					warning: '#f59e0b',
-					danger: '#ef4444',
-					success: '#10b981',
+					primary: '#0E9988', // Teal
+					secondary: '#14B8A6', // Light Teal
+					accent: '#0891B2', // Cyan
+					muted: '#F1F5F9',
+					warning: '#FBBF24',
+					danger: '#F43F5E',
+					success: '#10B981',
 				}
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'purple-gradient': 'linear-gradient(90deg, #8b5cf6, #6366f1)',
-				'vibrant-gradient': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
+				'teal-gradient': 'linear-gradient(90deg, #0D9488, #0891B2)',
+				'vibrant-gradient': 'linear-gradient(135deg, #0D9488 0%, #0891B2 50%, #06B6D4 100%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

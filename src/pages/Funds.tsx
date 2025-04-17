@@ -13,14 +13,15 @@ import { AlertCircle } from 'lucide-react';
 const Funds = () => {
   const [category, setCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('returns');
+  const [fundHouse, setFundHouse] = useState<string>('all');
   
   useEffect(() => {
     document.title = "Explore Funds | Keberiti";
   }, []);
 
-  const { data: funds, isLoading, error, isFetching } = useQuery({
-    queryKey: ['funds', category, sortBy],
-    queryFn: () => fetchFundsList(category, sortBy),
+  const { data: funds, isLoading, error, isFetching, refetch } = useQuery({
+    queryKey: ['funds', category, sortBy, fundHouse],
+    queryFn: () => fetchFundsList(category, sortBy, fundHouse),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,
@@ -41,17 +42,23 @@ const Funds = () => {
     setSortBy(newSort);
   };
 
+  const handleFundHouseChange = (newFundHouse: string) => {
+    setFundHouse(newFundHouse);
+  };
+
   return (
     <PageLayout 
       title="Explore Mutual Funds" 
       subtitle="Discover and compare top-performing regular mutual funds to grow your investments"
     >
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg shadow-sm p-6 mb-6 border border-indigo-100">
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg shadow-sm p-6 mb-6 border border-teal-100">
         <FundFilters 
           activeCategory={category} 
           onCategoryChange={handleCategoryChange}
           activeSortBy={sortBy}
           onSortChange={handleSortChange}
+          activeFundHouse={fundHouse}
+          onFundHouseChange={handleFundHouseChange}
         />
       </div>
 
@@ -80,16 +87,16 @@ const Funds = () => {
           <h3 className="text-lg font-medium text-red-800 mb-1">Error loading funds</h3>
           <p className="text-red-600 mb-4">We couldn't load the mutual fund data. Please try again later.</p>
           <button 
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 transition-colors"
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-md hover:from-teal-700 hover:to-cyan-700 transition-colors"
           >
             Retry
           </button>
         </div>
       ) : funds?.length === 0 ? (
-        <div className="text-center py-10 bg-indigo-50 rounded-lg border border-indigo-200">
-          <h3 className="text-lg font-medium text-indigo-800 mb-1">No funds found</h3>
-          <p className="text-indigo-600 mb-4">
+        <div className="text-center py-10 bg-teal-50 rounded-lg border border-teal-200">
+          <h3 className="text-lg font-medium text-teal-800 mb-1">No funds found</h3>
+          <p className="text-teal-600 mb-4">
             We couldn't find any mutual funds matching your criteria. Try changing your filters.
           </p>
         </div>

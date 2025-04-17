@@ -1,36 +1,38 @@
 
+import React from "react";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 
 export const LoadingSkeleton = () => {
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-[#F6F2F0] px-5 py-4">
-        <Skeleton className="h-6 w-full" />
-        <Skeleton className="h-4 w-2/3 mt-2" />
+    <Card className="overflow-hidden border border-teal-100">
+      <CardHeader className="bg-gradient-to-r from-teal-400 to-teal-300 px-5 py-4">
+        <div className="flex justify-between items-start gap-2">
+          <div className="space-y-2 w-full">
+            <Skeleton className="h-5 w-4/5 bg-teal-200" />
+            <Skeleton className="h-3 w-2/5 bg-teal-200" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full bg-teal-200" />
+        </div>
       </CardHeader>
-      <CardContent className="p-5">
+      <CardContent className="p-5 bg-white">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <div className="text-sm text-gray-500">Latest NAV</div>
-            <Skeleton className="h-6 w-20 mt-1" />
-            <Skeleton className="h-3 w-24 mt-1" />
+            <Skeleton className="h-4 w-16 mb-2 bg-teal-100" />
+            <Skeleton className="h-7 w-24 bg-teal-100" />
           </div>
           <div>
-            <div className="text-sm text-gray-500">1Y Returns</div>
-            <Skeleton className="h-6 w-16 mt-1" />
+            <Skeleton className="h-4 w-16 mb-2 bg-teal-100" />
+            <Skeleton className="h-7 w-24 bg-teal-100" />
           </div>
         </div>
       </CardContent>
-      <CardFooter className="bg-gray-50 px-5 py-3 flex justify-between">
-        <Button variant="outline" size="sm" disabled>
-          <Skeleton className="h-4 w-20" />
-        </Button>
-        <Button size="sm" disabled>
-          <Skeleton className="h-4 w-16" />
-        </Button>
+      <CardFooter className="bg-teal-50 px-5 py-3 flex justify-between">
+        <Skeleton className="h-8 w-24 bg-teal-100" />
+        <Skeleton className="h-8 w-24 bg-teal-100" />
       </CardFooter>
     </Card>
   );
 };
+
+export default LoadingSkeleton;
