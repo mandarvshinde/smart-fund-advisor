@@ -1,97 +1,95 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, TrendingDown, TrendingUp, Minus, ExternalLink } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchMarketInsights, MarketInsight } from "@/services/mockData";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { ArrowRight, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const MarketInsights = () => {
-  const { data: insights = [], isLoading } = useQuery({
-    queryKey: ['marketInsights'],
-    queryFn: fetchMarketInsights,
-  });
-
-  // Helper function to render impact icon
-  const renderImpactIcon = (impact: 'positive' | 'negative' | 'neutral') => {
+  // Sample empty data to use when no real insights exist
+  const insights = [];
+  
+  const getImpactIcon = (impact: string) => {
     switch (impact) {
-      case 'positive':
+      case "positive":
         return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'negative':
+      case "negative":
         return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
         return <Minus className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  // Helper function to get impact color
-  const getImpactColor = (impact: 'positive' | 'negative' | 'neutral') => {
-    switch (impact) {
-      case 'positive':
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "stocks":
+        return "bg-blue-100 text-blue-800";
+      case "bonds":
+        return "bg-purple-100 text-purple-800";
+      case "funds":
         return "bg-green-100 text-green-800";
-      case 'negative':
-        return "bg-red-100 text-red-800";
+      case "economy":
+        return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Market Insights</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Market Insights</CardTitle>
-          <Button variant="ghost" size="sm" className="text-sm text-muted-foreground h-8">
-            View All <ExternalLink className="ml-1 h-3 w-3" />
-          </Button>
+          <Link to="/insights" className="text-xs text-muted-foreground hover:underline">
+            View all
+          </Link>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {insights.map((insight: MarketInsight) => (
-          <div key={insight.id} className="space-y-2">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-2">
-                {renderImpactIcon(insight.impact)}
-                <h4 className="text-sm font-medium leading-none">{insight.title}</h4>
-              </div>
-              <Badge variant="secondary" className={`text-xs ${getImpactColor(insight.impact)}`}>
-                {insight.impact.charAt(0).toUpperCase() + insight.impact.slice(1)}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground pl-6">{insight.description}</p>
-            <div className="flex items-center justify-between pl-6">
-              <div className="flex items-center space-x-1">
-                <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200">
-                  {insight.category}
-                </Badge>
-              </div>
-              <div className="flex items-center text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3 mr-1" />
-                <span>{insight.date} • {insight.source}</span>
+      <CardContent>
+        {insights.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Market update</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                Global markets continue to adapt to economic changes and policy decisions.
+              </p>
+              <div className="flex justify-center space-x-2 text-xs">
+                <span className="px-2 py-1 rounded bg-blue-100 text-blue-800">Stocks</span>
+                <span className="px-2 py-1 rounded bg-purple-100 text-purple-800">Bonds</span>
+                <span className="px-2 py-1 rounded bg-green-100 text-green-800">Funds</span>
               </div>
             </div>
-            <Separator className="mt-3" />
           </div>
-        ))}
+        ) : (
+          <div className="space-y-4">
+            {insights.map((insight) => (
+              <div
+                key={insight.id}
+                className="border-b last:border-b-0 pb-3 last:pb-0"
+              >
+                <div className="flex items-start gap-2 mb-1">
+                  {getImpactIcon(insight.impact)}
+                  <h3 className="font-medium text-sm">{insight.title}</h3>
+                </div>
+                <p className="text-xs text-muted-foreground ml-6 mb-2">
+                  {insight.description}
+                </p>
+                <div className="flex justify-between items-center ml-6">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${getCategoryBadgeClass(
+                      insight.category
+                    )}`}
+                  >
+                    {insight.category}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {insight.date}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

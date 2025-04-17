@@ -1,39 +1,3 @@
-// --- NEW: API Response Types ---
-export interface ApiFundBasicInfo {
-  schemeCode: string; 
-  schemeName: string;
-}
-
-export interface ApiFundMeta {
-  fund_house: string;
-  scheme_type: string;
-  scheme_category: string;
-  scheme_code: number;
-  scheme_name: string;
-}
-
-export interface ApiFundNav {
-  date: string;
-  nav: string;
-}
-
-export interface ApiFundDetailsResponse {
-  meta: ApiFundMeta;
-  data: ApiFundNav[];
-  status: string;
-}
-
-// --- AMFI Data Types ---
-export interface AmfiData {
-  schemeCode: string;
-  isin: string;
-  isinReinvestment: string;
-  schemeName: string;
-  nav: string;
-  date: string;
-  fundHouse: string;
-  schemeType: string;
-}
 
 // --- Fund Type ---
 export interface Fund {
@@ -52,21 +16,16 @@ export interface Fund {
 
 // --- FundDetails Type ---
 export interface FundDetails extends Fund {
-  nav: string;
-  date: string;
-  fundHouse: string;
-  schemeType?: string;
-  category: string;
   riskLevel?: string;
   launchDate?: string;
-  returns?: {
-    oneYear?: number;
-    threeYear?: number;
-    fiveYear?: number;
-  };
+  schemeType?: string;
+  navHistory?: Array<{
+    date: string;
+    nav: number;
+  }>;
 }
 
-// --- Keep existing types if used elsewhere ---
+// --- Additional Types ---
 export interface Recommendation {
   id: string;
   type: 'buy' | 'sell' | 'switch';

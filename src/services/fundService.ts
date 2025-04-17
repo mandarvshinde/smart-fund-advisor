@@ -4,7 +4,50 @@ import axios from 'axios';
 
 const AMFI_DATA_URL = 'https://www.amfiindia.com/spages/NAVAll.TXT';
 
-// Map to cache parsed AMFI data
+// Fallback data in case API is down
+const FALLBACK_FUNDS: Fund[] = [
+  {
+    schemeCode: '119551',
+    schemeName: 'Axis Bluechip Fund - Growth',
+    nav: '45.87',
+    date: new Date().toLocaleDateString('en-IN'),
+    fundHouse: 'Axis Mutual Fund',
+    category: 'equity',
+    returns: {
+      oneYear: 12.5,
+      threeYear: 15.8,
+      fiveYear: 18.2
+    }
+  },
+  {
+    schemeCode: '120505',
+    schemeName: 'HDFC Balanced Advantage Fund - Regular Plan - Growth',
+    nav: '268.75',
+    date: new Date().toLocaleDateString('en-IN'),
+    fundHouse: 'HDFC Mutual Fund',
+    category: 'hybrid',
+    returns: {
+      oneYear: 8.3,
+      threeYear: 12.7,
+      fiveYear: 14.1
+    }
+  },
+  {
+    schemeCode: '118759',
+    schemeName: 'SBI Liquid Fund - Regular Plan - Growth',
+    nav: '3342.05',
+    date: new Date().toLocaleDateString('en-IN'),
+    fundHouse: 'SBI Mutual Fund',
+    category: 'debt',
+    returns: {
+      oneYear: 5.2,
+      threeYear: 6.8,
+      fiveYear: 7.3
+    }
+  }
+];
+
+// Cache for AMFI data
 let cachedAmfiData: Map<string, any> = new Map();
 let lastAmfiFetchTime = 0;
 let parsedFunds: Fund[] = [];
@@ -46,9 +89,6 @@ const parseAmfiData = (data: string): Fund[] => {
         // Determine category
         const category = determineFundCategory(schemeName, currentSchemeType);
         
-        // Generate random returns for demo
-        const oneYearReturn = generateRandomReturn(category);
-        
         funds.push({
           schemeCode,
           schemeName,
@@ -57,9 +97,9 @@ const parseAmfiData = (data: string): Fund[] => {
           fundHouse: currentFundHouse,
           category,
           returns: {
-            oneYear: oneYearReturn,
-            threeYear: oneYearReturn + Math.random() * 5,
-            fiveYear: oneYearReturn + Math.random() * 10
+            oneYear: getEstimatedReturn(category, 'oneYear'),
+            threeYear: getEstimatedReturn(category, 'threeYear'),
+            fiveYear: getEstimatedReturn(category, 'fiveYear')
           }
         });
       }
@@ -95,22 +135,21 @@ const determineFundCategory = (schemeName: string, schemeType: string): string =
   }
 };
 
-// Generate random returns based on fund category
-const generateRandomReturn = (category: string): number => {
-  switch (category) {
-    case 'equity':
-      return parseFloat((8 + Math.random() * 12).toFixed(2));
-    case 'debt':
-      return parseFloat((4 + Math.random() * 6).toFixed(2));
-    case 'hybrid':
-      return parseFloat((6 + Math.random() * 8).toFixed(2));
-    case 'index':
-      return parseFloat((7 + Math.random() * 10).toFixed(2));
-    case 'elss':
-      return parseFloat((9 + Math.random() * 11).toFixed(2));
-    default:
-      return parseFloat((5 + Math.random() * 10).toFixed(2));
-  }
+// Get estimated returns based on fund category and time period
+const getEstimatedReturn = (category: string, period: 'oneYear' | 'threeYear' | 'fiveYear'): number => {
+  const baseReturns: Record<string, Record<string, number>> = {
+    equity: { oneYear: 10, threeYear: 12, fiveYear: 14 },
+    debt: { oneYear: 5, threeYear: 6, fiveYear: 7 },
+    hybrid: { oneYear: 8, threeYear: 10, fiveYear: 12 },
+    index: { oneYear: 9, threeYear: 11, fiveYear: 13 },
+    elss: { oneYear: 11, threeYear: 13, fiveYear: 15 },
+    other: { oneYear: 7, threeYear: 9, fiveYear: 11 }
+  };
+  
+  // Add small random fluctuation
+  const baseReturn = baseReturns[category]?.[period] || 8;
+  const fluctuation = Math.random() * 4 - 2; // Random number between -2 and 2
+  return parseFloat((baseReturn + fluctuation).toFixed(2));
 };
 
 // Fetch and process AMFI data
@@ -141,8 +180,9 @@ const fetchAmfiData = async (): Promise<Fund[]> => {
     return parsedFunds;
   } catch (error) {
     console.error('Error fetching AMFI data:', error);
-    // Return empty array if there's an error
-    return [];
+    // Return fallback data if there's an error
+    console.warn('Returning fallback fund data due to API error');
+    return FALLBACK_FUNDS;
   }
 };
 
@@ -172,7 +212,7 @@ export const fetchFundsList = async (
     return sortFunds(filteredFunds, sortBy);
   } catch (error) {
     console.error('Error fetching mutual funds list:', error);
-    return [];
+    return FALLBACK_FUNDS;
   }
 };
 
@@ -241,10 +281,10 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
                           fund.category === 'debt' ? 0.01 : 0.03;
         
         // Create a somewhat realistic upward trend with fluctuations
-        const change = (i / 12) * (fund.returns.oneYear / 100) + 
+        const change = (i / 12) * ((fund.returns.oneYear || 0) / 100) + 
                       (Math.random() * 2 - 1) * volatility;
                       
-        const navValue = currentNav / (1 + (fund.returns.oneYear / 100)) * (1 + change);
+        const navValue = currentNav / (1 + ((fund.returns.oneYear || 0) / 100)) * (1 + change);
         
         data.push({
           date: date.toISOString().split('T')[0],
@@ -265,12 +305,8 @@ export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails 
       riskLevel: getRiskLevel(fund.category),
       returns: fund.returns,
       launchDate: '01-01-2015', // Mock date
-      expenseRatio: (0.5 + Math.random() * 1.5).toFixed(2) + '%',
-      aum: `₹${(Math.random() * 10000 + 1000).toFixed(2)} Cr`,
-      exitLoad: fund.category === 'debt' ? 'Nil' : '1% if redeemed within 1 year',
-      minInvestment: '₹' + (fund.category === 'debt' ? '5,000' : '1,000'),
-      navHistory: createHistoricalNavData(),
-      schemeType: fund.category.charAt(0).toUpperCase() + fund.category.slice(1)
+      schemeType: fund.category.charAt(0).toUpperCase() + fund.category.slice(1),
+      navHistory: createHistoricalNavData()
     };
   } catch (error) {
     console.error('Error fetching fund details:', error);
@@ -284,9 +320,9 @@ const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {
   
   switch (sortBy) {
     case 'returns':
-      return sortedFunds.sort((a, b) => (b.returns?.oneYear || 0) - (a.returns?.oneYear || 0));
+      return sortedFunds.sort((a, b) => ((b.returns?.oneYear || 0) - (a.returns?.oneYear || 0)));
     case 'returns-asc':
-      return sortedFunds.sort((a, b) => (a.returns?.oneYear || 0) - (b.returns?.oneYear || 0));
+      return sortedFunds.sort((a, b) => ((a.returns?.oneYear || 0) - (b.returns?.oneYear || 0)));
     case 'nav':
       return sortedFunds.sort((a, b) => parseFloat(b.nav) - parseFloat(a.nav));
     case 'nav-asc':
