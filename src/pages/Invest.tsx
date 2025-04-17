@@ -1,385 +1,337 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useUser } from '@/context/UserContext';
-import PageLayout from '@/components/layout/PageLayout';
-import { fetchFundDetails } from '@/services/fundService';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { AlertCircle, Calendar, CheckCircle, CreditCard, DollarSign, InfoIcon, MessageSquare, ShieldCheck } from 'lucide-react';
-
-// Define form schema
-const investmentSchema = z.object({
-  amount: z.string().min(1, { message: 'Please enter an amount' }),
-  investmentType: z.enum(['sip', 'lumpsum']),
-  sipDate: z.string().optional(),
-  accountType: z.enum(['savings', 'current']),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: 'You must accept the terms' }),
-  }),
-});
-
-type InvestmentForm = z.infer<typeof investmentSchema>;
+import { 
+  ArrowLeft, 
+  Calendar, 
+  CheckCircle, 
+  Clock,
+  HelpCircle, 
+  RefreshCw, 
+  DollarSign, 
+  Zap, 
+  AlertCircle
+} from 'lucide-react';
+import PageLayout from '@/components/layout/PageLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { fetchFundDetails } from '@/services/fundService';
 
 const Invest = () => {
-  const location = useLocation();
-  const { user } = useUser();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Get fund code from URL query params
-  const searchParams = new URLSearchParams(location.search);
+  const [searchParams] = useSearchParams();
   const fundCode = searchParams.get('fund');
+  const navigate = useNavigate();
   
-  // Fetch fund details if fund code is provided
-  const { data: fund, isLoading: fundLoading } = useQuery({
+  const [investmentType, setInvestmentType] = useState('sip');
+  const [amount, setAmount] = useState('5000');
+  const [installmentDay, setInstallmentDay] = useState('1');
+  
+  useEffect(() => {
+    document.title = "Invest | Keberiti";
+  }, []);
+  
+  const { data: fund, isLoading, error } = useQuery({
     queryKey: ['fund-details', fundCode],
     queryFn: () => fetchFundDetails(fundCode || ''),
     enabled: !!fundCode,
-    staleTime: 1000 * 60 * 15, // 15 minutes
-    refetchOnWindowFocus: true, // Changed from false to true
+    refetchOnWindowFocus: false,
+    retry: 2,
   });
   
-  const form = useForm<InvestmentForm>({
-    resolver: zodResolver(investmentSchema),
-    defaultValues: {
-      amount: '',
-      investmentType: 'sip',
-      sipDate: '1',
-      accountType: 'savings',
-      termsAccepted: false,
-    },
-  });
-  
-  const investmentType = form.watch('investmentType');
-  
-  useEffect(() => {
-    document.title = 'Invest | Kuberiti';
-  }, []);
-  
-  const onSubmit = async (data: InvestmentForm) => {
-    setIsSubmitting(true);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success(`Investment request submitted successfully!`, {
-        description: `Your ${data.investmentType === 'sip' ? 'SIP' : 'lumpsum'} investment of ₹${data.amount} has been initiated.`,
-        duration: 5000,
-      });
-      
-      // Reset form
-      form.reset();
-    } catch (error) {
-      toast.error('Failed to process investment', {
-        description: 'Please try again or contact our support team.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // In a real application, this would make an API call to submit the investment
+    toast.success(`${investmentType === 'sip' ? 'SIP' : 'Lumpsum'} investment initiated successfully!`);
+    
+    // Redirect to dashboard or investment confirmation page
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1500);
   };
   
-  const handleWhatsAppChat = () => {
-    window.open(`https://wa.me/918446597048?text=I'm interested in investing in ${fund?.schemeName}. Can you help me?`, '_blank');
-  };
+  const renderAmountInput = () => (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <label htmlFor="amount" className="text-sm font-medium">Investment Amount (₹)</label>
+        {investmentType === 'sip' && (
+          <span className="text-xs text-gray-500">Minimum: ₹500/month</span>
+        )}
+        {investmentType === 'lumpsum' && (
+          <span className="text-xs text-gray-500">Minimum: ₹5,000</span>
+        )}
+      </div>
+      <div className="relative">
+        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+        <Input
+          id="amount"
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="pl-10"
+          min={investmentType === 'sip' ? 500 : 5000}
+        />
+      </div>
+    </div>
+  );
+  
+  // If no fund code is provided, show a message
+  if (!fundCode) {
+    return (
+      <PageLayout
+        title="Start Investing"
+        subtitle="Begin your investment journey"
+      >
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">No fund selected</h2>
+            <p className="text-gray-600 mb-6">Please select a mutual fund to invest in.</p>
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              onClick={() => navigate('/funds')}
+            >
+              Browse Mutual Funds
+            </Button>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
   
   return (
-    <PageLayout 
-      title="Invest Now" 
-      subtitle="Start or modify your investment journey"
-      backLink="/funds"
+    <PageLayout
+      title="Start Investing"
+      subtitle="Begin your investment journey with a trusted asset management company"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="max-w-3xl mx-auto">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)} 
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back
+        </Button>
+        
+        {isLoading ? (
           <Card>
             <CardHeader>
-              <CardTitle>Investment Details</CardTitle>
-              <CardDescription>
-                {fund ? `Investment in ${fund.schemeName}` : 'Enter your investment details'}
-              </CardDescription>
+              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
             </CardHeader>
-            
             <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <Tabs defaultValue="sip" value={investmentType} onValueChange={(value) => form.setValue('investmentType', value as 'sip' | 'lumpsum')}>
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="sip">SIP Investment</TabsTrigger>
-                      <TabsTrigger value="lumpsum">Lumpsum Investment</TabsTrigger>
+              <div className="space-y-4">
+                <Skeleton className="h-40 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : error ? (
+          <Card className="text-center py-6">
+            <CardContent>
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Error loading fund</h2>
+              <p className="text-gray-600 mb-6">We couldn't load the details for this fund. Please try again later.</p>
+              <Button 
+                onClick={() => navigate('/funds')}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                Browse Other Funds
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-xl mb-1">{fund?.schemeName}</CardTitle>
+                    <div className="text-indigo-100 text-sm flex items-center">
+                      <span>{fund?.fundHouse}</span>
+                    </div>
+                  </div>
+                  <Badge className="bg-white text-indigo-700">{fund?.category}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">NAV</div>
+                    <div className="text-2xl font-semibold">₹{parseFloat(fund?.nav || '0').toFixed(2)}</div>
+                    <div className="text-xs text-gray-500">As of {fund?.date}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">1 Year Returns</div>
+                    <div className={`text-2xl font-semibold ${(fund?.returns?.oneYear || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {fund?.returns?.oneYear?.toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+                
+                <Separator className="my-4" />
+                
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center">
+                    <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 mr-2">
+                      {fund?.riskLevel || 'Moderate'}
+                    </Badge>
+                    <span>Risk Level</span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 text-indigo-600 mr-2" />
+                    <span>Min. SIP: ₹500</span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <DollarSign className="h-4 w-4 text-indigo-600 mr-2" />
+                    <span>Min. Lumpsum: ₹5,000</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Choose Investment Options</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit}>
+                  <Tabs defaultValue="sip" onValueChange={setInvestmentType}>
+                    <TabsList className="grid grid-cols-2 w-full mb-6">
+                      <TabsTrigger value="sip" className="text-center py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white">
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        SIP (Monthly)
+                      </TabsTrigger>
+                      <TabsTrigger value="lumpsum" className="text-center py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white">
+                        <Zap className="h-4 w-4 mr-2" />
+                        One-time Investment
+                      </TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="sip" className="pt-4">
-                      <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6">
-                          <div className="flex items-start">
-                            <InfoIcon className="h-5 w-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
-                            <div>
-                              <h3 className="text-sm font-medium text-blue-800">About SIP Investment</h3>
-                              <p className="text-xs text-blue-700 mt-1">
-                                A Systematic Investment Plan (SIP) allows you to invest a fixed amount regularly (usually monthly). This helps in averaging out your purchase cost over time and building wealth through disciplined investing.
-                              </p>
-                            </div>
+                    <TabsContent value="sip" className="space-y-6">
+                      {renderAmountInput()}
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <label htmlFor="installment-day" className="text-sm font-medium">
+                            SIP Day
+                          </label>
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-5 p-0">
+                                <HelpCircle className="h-4 w-4 text-gray-400" />
+                              </Button>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-80 text-sm">
+                              <p>Choose the day of the month when you want your SIP amount to be debited from your account.</p>
+                            </HoverCardContent>
+                          </HoverCard>
+                        </div>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                          <Select value={installmentDay} onValueChange={setInstallmentDay}>
+                            <SelectTrigger className="pl-10">
+                              <SelectValue placeholder="Select day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                                <SelectItem key={day} value={day.toString()}>
+                                  {day}
+                                  {day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'} of every month
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-indigo-50 rounded-lg p-4 space-y-2">
+                        <div className="flex items-start">
+                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-2" />
+                          <div>
+                            <h4 className="font-medium text-sm">SIP Benefits</h4>
+                            <p className="text-xs text-gray-600">Invest periodically without timing the market, reducing overall risk through rupee cost averaging.</p>
                           </div>
                         </div>
-                        
-                        <FormField
-                          control={form.control}
-                          name="amount"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Monthly SIP Amount (₹)</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-                                  <Input {...field} placeholder="1000" className="pl-8" type="number" min="500" />
-                                </div>
-                              </FormControl>
-                              <p className="text-xs text-gray-500">Minimum amount ₹500</p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="sipDate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>SIP Date</FormLabel>
-                              <FormControl>
-                                <RadioGroup 
-                                  onValueChange={field.onChange} 
-                                  defaultValue={field.value}
-                                  className="grid grid-cols-3 sm:grid-cols-6 gap-2"
-                                >
-                                  {[1, 5, 10, 15, 20, 25].map((date) => (
-                                    <div key={date} className="flex items-center space-x-2">
-                                      <RadioGroupItem value={date.toString()} id={`date-${date}`} />
-                                      <FormLabel htmlFor={`date-${date}`} className="font-normal cursor-pointer">
-                                        {date}
-                                      </FormLabel>
-                                    </div>
-                                  ))}
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="flex items-start">
+                          <Clock className="h-5 w-5 text-indigo-600 mt-0.5 mr-2" />
+                          <div>
+                            <h4 className="font-medium text-sm">SIP Timeline</h4>
+                            <p className="text-xs text-gray-600">Your first installment will be processed on {new Date().getMonth() + 1}/{installmentDay}/{new Date().getFullYear()}.</p>
+                          </div>
+                        </div>
                       </div>
                     </TabsContent>
                     
-                    <TabsContent value="lumpsum" className="pt-4">
-                      <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6">
-                          <div className="flex items-start">
-                            <InfoIcon className="h-5 w-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
-                            <div>
-                              <h3 className="text-sm font-medium text-blue-800">About Lumpsum Investment</h3>
-                              <p className="text-xs text-blue-700 mt-1">
-                                A lumpsum investment is a one-time investment of a larger amount. This approach can be beneficial during market dips or when you have a sizable amount to invest at once.
-                              </p>
-                            </div>
+                    <TabsContent value="lumpsum" className="space-y-6">
+                      {renderAmountInput()}
+                      
+                      <div className="bg-indigo-50 rounded-lg p-4 space-y-2">
+                        <div className="flex items-start">
+                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-2" />
+                          <div>
+                            <h4 className="font-medium text-sm">One-time Investment Benefits</h4>
+                            <p className="text-xs text-gray-600">Invest a larger amount at once, potentially benefiting from market opportunities and lower transaction costs.</p>
                           </div>
                         </div>
-                        
-                        <FormField
-                          control={form.control}
-                          name="amount"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Lumpsum Amount (₹)</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-                                  <Input {...field} placeholder="5000" className="pl-8" type="number" min="1000" />
-                                </div>
-                              </FormControl>
-                              <p className="text-xs text-gray-500">Minimum amount ₹1,000</p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="flex items-start">
+                          <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 mr-2" />
+                          <div>
+                            <h4 className="font-medium text-sm">Market Timing</h4>
+                            <p className="text-xs text-gray-600">Be aware that one-time investments are subject to market timing risk.</p>
+                          </div>
+                        </div>
                       </div>
                     </TabsContent>
                   </Tabs>
                   
-                  <Separator />
-                  
-                  <FormField
-                    control={form.control}
-                    name="accountType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Type</FormLabel>
-                        <FormControl>
-                          <RadioGroup 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                            className="flex space-x-6"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="savings" id="savings" />
-                              <FormLabel htmlFor="savings" className="font-normal cursor-pointer">Savings Account</FormLabel>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="current" id="current" />
-                              <FormLabel htmlFor="current" className="font-normal cursor-pointer">Current Account</FormLabel>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="termsAccepted"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm font-normal">
-                            I agree to the terms and conditions and have read and understood the scheme information document.
-                          </FormLabel>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="pt-2">
-                    <Button type="submit" className="w-full bg-[#8D6E63] hover:bg-[#6D4C41]" disabled={isSubmitting}>
-                      {isSubmitting ? (
-                        <>
-                          <span className="animate-spin mr-2">●</span>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="mr-2 h-4 w-4" />
-                          Proceed to Payment
-                        </>
-                      )}
+                  <div className="mt-8">
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 py-6 text-lg"
+                    >
+                      Proceed to Payment
                     </Button>
                   </div>
                 </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="space-y-6">
-          {fund ? (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle>Fund Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium">{fund.schemeName}</h3>
-                  <p className="text-sm text-gray-500">{fund.fundHouse}</p>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid grid-cols-2 gap-y-3">
-                  <div className="text-sm text-gray-500">NAV</div>
-                  <div className="text-sm text-right font-medium">₹{parseFloat(fund.nav).toFixed(2)}</div>
-                  
-                  <div className="text-sm text-gray-500">Category</div>
-                  <div className="text-sm text-right font-medium">{fund.category}</div>
-                  
-                  <div className="text-sm text-gray-500">1 Year Return</div>
-                  <div className={`text-sm text-right font-medium ${(fund.returns?.oneYear || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {fund.returns?.oneYear ? `${fund.returns.oneYear.toFixed(2)}%` : 'NA'}
-                  </div>
-                  
-                  <div className="text-sm text-gray-500">Min. SIP</div>
-                  <div className="text-sm text-right font-medium">₹500</div>
-                  
-                  <div className="text-sm text-gray-500">Min. Lumpsum</div>
-                  <div className="text-sm text-right font-medium">₹1,000</div>
-                </div>
               </CardContent>
-              <CardFooter className="pt-0">
-                <Button onClick={handleWhatsAppChat} variant="outline" size="sm" className="w-full">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Need Help?
-                </Button>
+              <CardFooter className="bg-gray-50 px-6 py-4 text-sm text-gray-600">
+                <p>Your investment will be processed securely. Funds will be directly invested with the asset management company.</p>
               </CardFooter>
             </Card>
-          ) : fundLoading ? (
-            <Card>
-              <CardContent className="py-6">
-                <div className="flex flex-col items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#8D6E63] mb-3"></div>
-                  <p className="text-sm text-gray-500">Loading fund details...</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : null}
-          
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Secure Investment</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <ShieldCheck className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm font-medium">SEBI Regulated</h4>
-                  <p className="text-xs text-gray-500">All investments are regulated by Securities and Exchange Board of India</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <CreditCard className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm font-medium">Secure Payments</h4>
-                  <p className="text-xs text-gray-500">All payments are processed via secure gateways</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm font-medium">Transparent Process</h4>
-                  <p className="text-xs text-gray-500">No hidden charges or fees</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <div className="rounded-lg bg-gradient-to-br from-[#8D6E63] to-[#5D4037] p-4 text-white">
-            <div className="flex items-center mb-3">
-              <Calendar className="h-5 w-5 mr-2" />
-              <h3 className="font-medium">Start Early, Invest Regularly</h3>
-            </div>
-            <p className="text-sm opacity-90 mb-3">
-              The power of compounding works best over long periods. Start your investment journey today.
-            </p>
-            <Button variant="secondary" size="sm" className="w-full" onClick={handleWhatsAppChat}>
-              Talk to an Advisor
-            </Button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </PageLayout>
   );

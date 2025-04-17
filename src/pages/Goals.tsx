@@ -1,112 +1,146 @@
 
-import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Plus, Target, ArrowRight } from "lucide-react";
-import { fetchGoals } from "@/services/mockData";
-import PageLayout from "@/components/layout/PageLayout";
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import PageLayout from '@/components/layout/PageLayout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Target, Plus, Calendar, DollarSign, TrendingUp } from 'lucide-react';
+import { Goal } from '@/types';
+
+// Mock goals data (would be fetched from an API in a real application)
+const mockGoals: Goal[] = [
+  {
+    id: '1',
+    name: 'Retirement',
+    targetAmount: 10000000,
+    targetDate: '2045-01-01',
+    currentAmount: 2500000,
+    monthlyContribution: 15000,
+    progress: 25,
+    investments: ['1', '2', '3'],
+    riskAppetite: 'moderate'
+  },
+  {
+    id: '2',
+    name: 'Home Purchase',
+    targetAmount: 5000000,
+    targetDate: '2028-06-30',
+    currentAmount: 1000000,
+    monthlyContribution: 25000,
+    progress: 20,
+    investments: ['4', '5'],
+    riskAppetite: 'high'
+  },
+  {
+    id: '3',
+    name: 'Child\'s Education',
+    targetAmount: 3000000,
+    targetDate: '2035-04-15',
+    currentAmount: 450000,
+    monthlyContribution: 10000,
+    progress: 15,
+    investments: ['6'],
+    riskAppetite: 'low'
+  }
+];
 
 const Goals = () => {
-  const { toast } = useToast();
+  const [goals, setGoals] = useState<Goal[]>([]);
   
   useEffect(() => {
+    // In a real app, this would be an API call
+    setGoals(mockGoals);
     document.title = "Financial Goals | Keberiti";
   }, []);
-
-  const { data: goals, isLoading, error } = useQuery({
-    queryKey: ['goals'],
-    queryFn: fetchGoals,
-  });
-
-  if (error) {
-    toast({
-      variant: "destructive",
-      title: "Error loading goals",
-      description: "There was an error loading your financial goals. Please try again later.",
-    });
-  }
-
+  
   return (
-    <PageLayout>
-      <div className="container mx-auto py-6 max-w-5xl">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Your Financial Goals</h1>
-          <Button asChild>
-            <Link to="/goals/create">
-              <Plus className="mr-2 h-4 w-4" /> Create New Goal
-            </Link>
-          </Button>
+    <PageLayout 
+      title="Financial Goals" 
+      subtitle="Track and manage your long-term financial objectives"
+    >
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-semibold mb-1">Your Goals</h2>
+          <p className="text-gray-600">Track the progress towards your financial objectives</p>
         </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="shadow-sm">
-                <CardHeader className="pb-2">
-                  <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+        <Button 
+          asChild 
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+        >
+          <Link to="/goals/create">
+            <Plus className="mr-2 h-4 w-4" />
+            Create New Goal
+          </Link>
+        </Button>
+      </div>
+      
+      {goals.length === 0 ? (
+        <Card className="text-center py-10">
+          <CardContent>
+            <Target className="mx-auto h-12 w-12 text-purple-500 mb-3" />
+            <h3 className="text-lg font-medium mb-2">No goals yet</h3>
+            <p className="text-gray-600 mb-6">
+              Start planning your financial future by creating your first goal.
+            </p>
+            <Button 
+              asChild 
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            >
+              <Link to="/goals/create">Create Your First Goal</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {goals.map((goal) => (
+            <Link to={`/goals/${goal.id}`} key={goal.id}>
+              <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                  <CardTitle className="text-xl">
+                    {goal.name}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse mb-4"></div>
-                  <div className="h-2 w-full bg-gray-200 rounded animate-pulse mb-4"></div>
-                  <div className="h-8 w-full bg-gray-200 rounded animate-pulse"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : !goals || goals.length === 0 ? (
-          <Card className="shadow-sm">
-            <CardContent className="pt-10 pb-10 text-center">
-              <Target className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">No goals set yet</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                Set financial goals to track your progress and get personalized recommendations 
-                for your investment portfolio.
-              </p>
-              <Button asChild>
-                <Link to="/goals/create">Create Your First Goal</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {goals.map((goal) => (
-              <Card key={goal.id} className="shadow-sm hover:shadow transition-shadow">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium text-gray-900">{goal.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Target: ₹{goal.targetAmount.toLocaleString()}</span>
-                      <span className="text-gray-600">
-                        Saved: ₹{goal.currentAmount.toLocaleString()} ({goal.progress.toFixed(1)}%)
-                      </span>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-gray-600">Progress</span>
+                      <span className="font-medium">{goal.progress}%</span>
                     </div>
-                    <Progress value={goal.progress} className="h-2" />
+                    <Progress value={goal.progress} className="h-2 bg-purple-100" />
                   </div>
                   
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="text-sm text-gray-500">
-                      Target Date: {new Date(goal.targetDate).toLocaleDateString()}
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <DollarSign className="h-4 w-4 text-purple-500 mr-2" />
+                      <div className="flex justify-between w-full">
+                        <span className="text-gray-600">Target</span>
+                        <span className="font-medium">₹{goal.targetAmount.toLocaleString()}</span>
+                      </div>
                     </div>
                     
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to={`/goals/${goal.id}`}>
-                        Details
-                        <ArrowRight className="ml-1 h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 text-purple-500 mr-2" />
+                      <div className="flex justify-between w-full">
+                        <span className="text-gray-600">Target Date</span>
+                        <span className="font-medium">{new Date(goal.targetDate).toLocaleDateString('en-IN')}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <TrendingUp className="h-4 w-4 text-purple-500 mr-2" />
+                      <div className="flex justify-between w-full">
+                        <span className="text-gray-600">Monthly</span>
+                        <span className="font-medium">₹{goal.monthlyContribution.toLocaleString()}</span>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </PageLayout>
   );
 };
