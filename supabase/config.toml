@@ -1,1 +1,14 @@
+
 project_id = "tnhpvlljhcbwegkoirzs"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[functions]
+[functions.notify-new-user]
+verify_jwt = false

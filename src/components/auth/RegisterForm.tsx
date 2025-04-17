@@ -64,7 +64,6 @@ const RegisterForm = () => {
             name: data.name,
             risk_appetite: data.riskAppetite,
           },
-          // Disable email confirmation for direct login
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
@@ -76,7 +75,6 @@ const RegisterForm = () => {
       
       console.log("Registration successful:", authData);
       
-      // Always show success and navigate to login
       toast({
         title: "Registration Successful",
         description: "Your account has been created. You can now sign in with your credentials.",

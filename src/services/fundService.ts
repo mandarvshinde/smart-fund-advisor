@@ -1,81 +1,18 @@
 
-import { Fund, FundDetails, ApiFundBasicInfo, AmfiData } from '@/types/fundTypes';
+import { Fund, FundDetails } from '@/types/fundTypes';
 import axios from 'axios';
 
-const MFAPI_BASE_URL = 'https://api.mfapi.in';
 const AMFI_DATA_URL = 'https://www.amfiindia.com/spages/NAVAll.TXT';
 
 // Map to cache parsed AMFI data
 let cachedAmfiData: Map<string, any> = new Map();
 let lastAmfiFetchTime = 0;
-
-// Mock data for when AMFI data cannot be fetched
-const MOCK_FUND_HOUSES = [
-  'Aditya Birla Sun Life Mutual Fund',
-  'Axis Mutual Fund',
-  'DSP Mutual Fund',
-  'Franklin Templeton Mutual Fund',
-  'HDFC Mutual Fund',
-  'ICICI Prudential Mutual Fund',
-  'Kotak Mahindra Mutual Fund',
-  'Mirae Asset Mutual Fund',
-  'Nippon India Mutual Fund',
-  'SBI Mutual Fund',
-  'UTI Mutual Fund'
-];
-
-// Generate mock fund data
-const generateMockFunds = (count = 500): AmfiData[] => {
-  const funds: AmfiData[] = [];
-  const categories = ['Equity', 'Debt', 'Hybrid', 'Index', 'ELSS'];
-  const schemeTypes = ['Open End', 'Close End'];
-  
-  for (let i = 0; i < count; i++) {
-    const fundHouse = MOCK_FUND_HOUSES[Math.floor(Math.random() * MOCK_FUND_HOUSES.length)];
-    const category = categories[Math.floor(Math.random() * categories.length)];
-    const schemeType = schemeTypes[Math.floor(Math.random() * schemeTypes.length)];
-    
-    let schemeName = '';
-    switch(category) {
-      case 'Equity':
-        schemeName = `${fundHouse} ${['Large Cap', 'Mid Cap', 'Small Cap', 'Multi Cap', 'Flexi Cap'][Math.floor(Math.random() * 5)]} Fund`;
-        break;
-      case 'Debt':
-        schemeName = `${fundHouse} ${['Corporate Bond', 'Banking & PSU', 'Liquid', 'Ultra Short Duration', 'Short Duration'][Math.floor(Math.random() * 5)]} Fund`;
-        break;
-      case 'Hybrid':
-        schemeName = `${fundHouse} ${['Balanced Advantage', 'Aggressive Hybrid', 'Conservative Hybrid', 'Multi Asset Allocation'][Math.floor(Math.random() * 4)]} Fund`;
-        break;
-      case 'Index':
-        schemeName = `${fundHouse} ${['Nifty 50', 'Sensex', 'Nifty Next 50', 'Nifty Midcap 150'][Math.floor(Math.random() * 4)]} Index Fund`;
-        break;
-      case 'ELSS':
-        schemeName = `${fundHouse} Tax Saver Fund`;
-        break;
-    }
-    
-    const nav = (Math.random() * 500 + 10).toFixed(2);
-    const date = '17-04-2025';
-    
-    funds.push({
-      schemeCode: `10${i}`,
-      isin: `INF${1000000 + i}`,
-      isinReinvestment: `INF${2000000 + i}`,
-      schemeName: schemeName + ' - Regular Plan',
-      nav,
-      date,
-      fundHouse,
-      schemeType: `${schemeType} - ${category} Fund`
-    });
-  }
-  
-  return funds;
-};
+let parsedFunds: Fund[] = [];
 
 // Parse AMFI data text file into structured data
-const parseAmfiData = (data: string) => {
+const parseAmfiData = (data: string): Fund[] => {
   const lines = data.split('\n');
-  const funds: any[] = [];
+  const funds: Fund[] = [];
   
   let currentFundHouse = '';
   let currentSchemeType = '';
@@ -102,15 +39,28 @@ const parseAmfiData = (data: string) => {
       
       // Only include regular plans (exclude Direct)
       if (!schemeName.toLowerCase().includes('direct') && schemeName.length > 0) {
+        const schemeCode = parts[0].trim();
+        const nav = parts[4].trim();
+        const date = parts[5]?.trim() || new Date().toLocaleDateString('en-IN');
+        
+        // Determine category
+        const category = determineFundCategory(schemeName, currentSchemeType);
+        
+        // Generate random returns for demo
+        const oneYearReturn = generateRandomReturn(category);
+        
         funds.push({
-          schemeCode: parts[0].trim(),
-          isin: parts[1].trim(),
-          isinReinvestment: parts[2].trim(),
+          schemeCode,
           schemeName,
-          nav: parts[4].trim(),
-          date: parts[5].trim(),
+          nav,
+          date,
           fundHouse: currentFundHouse,
-          schemeType: currentSchemeType
+          category,
+          returns: {
+            oneYear: oneYearReturn,
+            threeYear: oneYearReturn + Math.random() * 5,
+            fiveYear: oneYearReturn + Math.random() * 10
+          }
         });
       }
     }
@@ -119,186 +69,120 @@ const parseAmfiData = (data: string) => {
   return funds;
 };
 
-// Determine category from scheme name
-const determineFundCategory = (schemeName: string, schemeType: string) => {
+// Determine category from scheme name and type
+const determineFundCategory = (schemeName: string, schemeType: string): string => {
   const name = schemeName.toLowerCase();
   const type = schemeType.toLowerCase();
   
-  if (name.includes('equity') || name.includes('growth') || name.includes('large cap') || 
-      name.includes('mid cap') || name.includes('small cap') || name.includes('flexi cap')) {
-    return 'Equity';
-  } else if (name.includes('debt') || name.includes('income') || name.includes('liquid') || 
-             name.includes('overnight') || name.includes('ultra short') || name.includes('bond')) {
-    return 'Debt';
+  if (name.includes('equity') || name.includes('growth') || 
+      name.includes('large cap') || name.includes('mid cap') || 
+      name.includes('small cap') || name.includes('flexi cap')) {
+    return 'equity';
+  } else if (name.includes('debt') || name.includes('income') || 
+             name.includes('liquid') || name.includes('overnight') || 
+             name.includes('ultra short') || name.includes('bond')) {
+    return 'debt';
   } else if (name.includes('hybrid') || name.includes('balanced') || 
              name.includes('conservative') || name.includes('aggressive')) {
-    return 'Hybrid';
-  } else if (name.includes('index') || name.includes('nifty') || name.includes('sensex') || 
-             name.includes('etf')) {
-    return 'Index';
+    return 'hybrid';
+  } else if (name.includes('index') || name.includes('nifty') || 
+             name.includes('sensex') || name.includes('etf')) {
+    return 'index';
   } else if (name.includes('tax') || name.includes('elss')) {
-    return 'ELSS';
+    return 'elss';
   } else {
-    return 'Other';
+    return 'other';
   }
 };
 
-// Get risk level based on category
-const getRiskLevel = (category: string): string => {
+// Generate random returns based on fund category
+const generateRandomReturn = (category: string): number => {
   switch (category) {
-    case 'Equity':
-      return 'High';
-    case 'Hybrid':
-      return 'Moderate';
-    case 'Debt':
-      return 'Low';
-    case 'ELSS':
-      return 'High';
-    case 'Index':
-      return 'Moderate to High';
+    case 'equity':
+      return parseFloat((8 + Math.random() * 12).toFixed(2));
+    case 'debt':
+      return parseFloat((4 + Math.random() * 6).toFixed(2));
+    case 'hybrid':
+      return parseFloat((6 + Math.random() * 8).toFixed(2));
+    case 'index':
+      return parseFloat((7 + Math.random() * 10).toFixed(2));
+    case 'elss':
+      return parseFloat((9 + Math.random() * 11).toFixed(2));
     default:
-      return 'Moderate';
+      return parseFloat((5 + Math.random() * 10).toFixed(2));
   }
 };
 
 // Fetch and process AMFI data
-const fetchAmfiData = async () => {
-  // Only fetch new data if cache is expired (15 minutes)
-  const now = Date.now();
-  if (cachedAmfiData.size > 0 && now - lastAmfiFetchTime < 15 * 60 * 1000) {
-    return Array.from(cachedAmfiData.values());
-  }
-  
+const fetchAmfiData = async (): Promise<Fund[]> => {
   try {
+    // Only fetch new data if cache is expired (15 minutes)
+    const now = Date.now();
+    if (parsedFunds.length > 0 && now - lastAmfiFetchTime < 15 * 60 * 1000) {
+      return parsedFunds;
+    }
+    
+    console.log('Fetching fresh AMFI data...');
     const response = await axios.get(AMFI_DATA_URL, {
       responseType: 'text'
     });
     
-    const funds = parseAmfiData(response.data);
+    // Parse the data
+    parsedFunds = parseAmfiData(response.data);
     
     // Update cache
     cachedAmfiData = new Map();
-    funds.forEach(fund => {
+    parsedFunds.forEach(fund => {
       cachedAmfiData.set(fund.schemeCode, fund);
     });
     
     lastAmfiFetchTime = now;
-    return funds;
+    console.log(`Parsed ${parsedFunds.length} mutual funds from AMFI data`);
+    return parsedFunds;
   } catch (error) {
     console.error('Error fetching AMFI data:', error);
-    // If AMFI data fetch fails, use mock data
-    const mockFunds = generateMockFunds();
-    
-    // Update cache with mock data
-    cachedAmfiData = new Map();
-    mockFunds.forEach(fund => {
-      cachedAmfiData.set(fund.schemeCode, fund);
-    });
-    
-    lastAmfiFetchTime = now;
-    return mockFunds;
-  }
-};
-
-// Enhance AMFI data with additional data
-const enhanceFundData = async (amfiFunds: any[], limit = 100): Promise<Fund[]> => {
-  try {
-    // Process a subset of funds to avoid too many API calls
-    const fundsToProcess = amfiFunds.slice(0, limit);
-    
-    const enhancedFunds = await Promise.all(
-      fundsToProcess.map(async (fund) => {
-        try {
-          // Try to get additional data from MFAPI
-          const category = determineFundCategory(fund.schemeName, fund.schemeType);
-          
-          // Generate returns data (in a real app, get this from MFAPI)
-          return {
-            schemeCode: fund.schemeCode,
-            schemeName: fund.schemeName,
-            nav: fund.nav,
-            date: fund.date,
-            fundHouse: fund.fundHouse,
-            category,
-            returns: {
-              oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-              threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-              fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-            }
-          };
-        } catch (error) {
-          console.error(`Error enhancing fund ${fund.schemeCode}:`, error);
-          return null;
-        }
-      })
-    );
-    
-    return enhancedFunds.filter(fund => fund !== null) as Fund[];
-  } catch (error) {
-    console.error('Error enhancing fund data:', error);
+    // Return empty array if there's an error
     return [];
   }
 };
 
 // Get list of all mutual funds
 export const fetchFundsList = async (
-  category: string, 
+  category: string,
   sortBy: string,
   fundHouse?: string
 ): Promise<Fund[]> => {
   try {
-    // Fetch data from AMFI
-    const amfiFunds = await fetchAmfiData();
+    const funds = await fetchAmfiData();
     
-    // Apply category filter first to reduce the number of funds we need to enhance
-    let filteredFunds = amfiFunds;
+    // Apply filters
+    let filteredFunds = funds;
     
-    if (category !== 'all') {
-      filteredFunds = amfiFunds.filter(fund => {
-        const fundCategory = determineFundCategory(fund.schemeName, fund.schemeType);
-        return fundCategory.toLowerCase() === category.toLowerCase();
-      });
+    if (category && category !== 'all') {
+      filteredFunds = filteredFunds.filter(fund => fund.category === category.toLowerCase());
     }
     
-    // Apply fund house filter if provided
     if (fundHouse && fundHouse !== 'all') {
       filteredFunds = filteredFunds.filter(fund => 
         fund.fundHouse.toLowerCase().includes(fundHouse.toLowerCase())
       );
     }
     
-    // Enhance filtered funds with additional data
-    const enhancedFunds = await enhanceFundData(filteredFunds, 100);
-    
-    // Sort the enhanced funds
-    return sortFunds(enhancedFunds, sortBy);
+    // Sort the filtered funds
+    return sortFunds(filteredFunds, sortBy);
   } catch (error) {
     console.error('Error fetching mutual funds list:', error);
-    // Return some mock data even if there's an error
-    const mockFunds = generateMockFunds(50).map(fund => ({
-      schemeCode: fund.schemeCode,
-      schemeName: fund.schemeName,
-      nav: fund.nav,
-      date: fund.date,
-      fundHouse: fund.fundHouse,
-      category: determineFundCategory(fund.schemeName, fund.schemeType),
-      returns: {
-        oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-        threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-        fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-      }
-    }));
-    return sortFunds(mockFunds, sortBy);
+    return [];
   }
 };
 
 // Get all fund houses for filter
 export const getFundHouses = async (): Promise<string[]> => {
   try {
-    const amfiFunds = await fetchAmfiData();
+    const funds = await fetchAmfiData();
     const fundHouses = new Set<string>();
     
-    amfiFunds.forEach(fund => {
+    funds.forEach(fund => {
       if (fund.fundHouse) {
         fundHouses.add(fund.fundHouse);
       }
@@ -307,146 +191,92 @@ export const getFundHouses = async (): Promise<string[]> => {
     return Array.from(fundHouses).sort();
   } catch (error) {
     console.error('Error getting fund houses:', error);
-    // Return mock fund houses
-    return [...MOCK_FUND_HOUSES].sort();
+    return [];
   }
 };
 
 export const fetchFundDetails = async (schemeCode: string): Promise<FundDetails | null> => {
   try {
-    // First check if we have this fund in AMFI cache
-    let amfiFund = null;
-    if (cachedAmfiData.has(schemeCode)) {
-      amfiFund = cachedAmfiData.get(schemeCode);
-    } else {
-      // If not in cache, refresh cache and try again
-      await fetchAmfiData();
-      amfiFund = cachedAmfiData.get(schemeCode);
+    await fetchAmfiData(); // Ensure data is loaded
+    
+    const fund = cachedAmfiData.get(schemeCode);
+    
+    if (!fund) {
+      console.error(`Fund with scheme code ${schemeCode} not found in cache`);
+      return null;
     }
     
-    if (!amfiFund) {
-      // Try to get from MFAPI as fallback
-      try {
-        const response = await axios.get(`${MFAPI_BASE_URL}/mf/${schemeCode}`);
-        
-        if (!response.data || !response.data.data || response.data.data.length === 0) {
-          // If MFAPI also fails, generate mock data
-          const mockFund = generateMockFunds(1)[0];
-          const category = determineFundCategory(mockFund.schemeName, mockFund.schemeType);
-          
-          return {
-            schemeCode: schemeCode,
-            schemeName: mockFund.schemeName,
-            nav: mockFund.nav,
-            date: mockFund.date,
-            fundHouse: mockFund.fundHouse,
-            schemeType: mockFund.schemeType,
-            category: category,
-            riskLevel: getRiskLevel(category),
-            launchDate: '01-01-2015',
-            returns: {
-              oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-              threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-              fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-            }
-          };
-        }
-        
-        // Get the latest NAV data
-        const latestNav = response.data.data[0];
-        const category = determineFundCategory(response.data.meta.scheme_name, '');
-        
-        // Return details from MFAPI
-        return {
-          schemeCode: schemeCode,
-          schemeName: response.data.meta.scheme_name,
-          nav: latestNav.nav,
-          date: latestNav.date,
-          fundHouse: response.data.meta.fund_house,
-          schemeType: response.data.meta.scheme_type,
-          category: category,
-          riskLevel: getRiskLevel(category),
-          launchDate: estimateLaunchDate(response.data.data),
-          returns: {
-            oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-            threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-            fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-          }
-        };
-      } catch (error) {
-        // If all APIs fail, generate mock data
-        const mockFund = generateMockFunds(1)[0];
-        const category = determineFundCategory(mockFund.schemeName, mockFund.schemeType);
-        
-        return {
-          schemeCode: schemeCode,
-          schemeName: mockFund.schemeName,
-          nav: mockFund.nav,
-          date: mockFund.date,
-          fundHouse: mockFund.fundHouse,
-          schemeType: mockFund.schemeType,
-          category: category,
-          riskLevel: getRiskLevel(category),
-          launchDate: '01-01-2015',
-          returns: {
-            oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-            threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-            fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-          }
-        };
+    // Get risk level based on category
+    const getRiskLevel = (category: string): string => {
+      switch (category) {
+        case 'equity':
+          return 'High';
+        case 'hybrid':
+          return 'Moderate';
+        case 'debt':
+          return 'Low';
+        case 'elss':
+          return 'High';
+        case 'index':
+          return 'Moderate to High';
+        default:
+          return 'Moderate';
       }
-    }
+    };
     
-    // Construct response from AMFI data
-    const category = determineFundCategory(amfiFund.schemeName, amfiFund.schemeType || '');
+    // Create historical NAV data for demo
+    const createHistoricalNavData = () => {
+      const data = [];
+      const currentNav = parseFloat(fund.nav);
+      const startDate = new Date();
+      startDate.setFullYear(startDate.getFullYear() - 1);
+      
+      // Generate monthly data points for the past year
+      for (let i = 0; i <= 12; i++) {
+        const date = new Date(startDate);
+        date.setMonth(date.getMonth() + i);
+        
+        // Fluctuate NAV based on category volatility
+        const volatility = fund.category === 'equity' ? 0.05 : 
+                          fund.category === 'debt' ? 0.01 : 0.03;
+        
+        // Create a somewhat realistic upward trend with fluctuations
+        const change = (i / 12) * (fund.returns.oneYear / 100) + 
+                      (Math.random() * 2 - 1) * volatility;
+                      
+        const navValue = currentNav / (1 + (fund.returns.oneYear / 100)) * (1 + change);
+        
+        data.push({
+          date: date.toISOString().split('T')[0],
+          nav: parseFloat(navValue.toFixed(2))
+        });
+      }
+      
+      return data;
+    };
     
     return {
-      schemeCode: amfiFund.schemeCode,
-      schemeName: amfiFund.schemeName,
-      nav: amfiFund.nav,
-      date: amfiFund.date,
-      fundHouse: amfiFund.fundHouse,
-      schemeType: amfiFund.schemeType,
-      category: category,
-      riskLevel: getRiskLevel(category),
-      launchDate: 'NA', // AMFI doesn't provide launch date
-      returns: {
-        oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-        threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-        fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-      }
+      schemeCode: fund.schemeCode,
+      schemeName: fund.schemeName,
+      nav: fund.nav,
+      date: fund.date,
+      fundHouse: fund.fundHouse,
+      category: fund.category,
+      riskLevel: getRiskLevel(fund.category),
+      returns: fund.returns,
+      launchDate: '01-01-2015', // Mock date
+      expenseRatio: (0.5 + Math.random() * 1.5).toFixed(2) + '%',
+      aum: `₹${(Math.random() * 10000 + 1000).toFixed(2)} Cr`,
+      exitLoad: fund.category === 'debt' ? 'Nil' : '1% if redeemed within 1 year',
+      minInvestment: '₹' + (fund.category === 'debt' ? '5,000' : '1,000'),
+      navHistory: createHistoricalNavData(),
+      schemeType: fund.category.charAt(0).toUpperCase() + fund.category.slice(1)
     };
   } catch (error) {
     console.error('Error fetching fund details:', error);
-    // Return mock data for fund details in case of error
-    const mockFund = generateMockFunds(1)[0];
-    const category = determineFundCategory(mockFund.schemeName, mockFund.schemeType);
-    
-    return {
-      schemeCode: schemeCode,
-      schemeName: mockFund.schemeName,
-      nav: mockFund.nav,
-      date: mockFund.date,
-      fundHouse: mockFund.fundHouse,
-      schemeType: mockFund.schemeType,
-      category: category,
-      riskLevel: getRiskLevel(category),
-      launchDate: '01-01-2015',
-      returns: {
-        oneYear: Number((Math.random() * 30 - 5).toFixed(2)),
-        threeYear: Number((Math.random() * 40 + 5).toFixed(2)),
-        fiveYear: Number((Math.random() * 60 + 10).toFixed(2)),
-      }
-    };
+    return null;
   }
 };
-
-// Helper function to estimate launch date from NAV data
-function estimateLaunchDate(navData: { date: string; nav: string }[]): string {
-  // The oldest data point should be close to the launch date
-  const oldestDataPoint = navData[navData.length - 1];
-  return oldestDataPoint ? oldestDataPoint.date : 'NA';
-}
 
 // Sort funds based on criteria
 const sortFunds = (funds: Fund[], sortBy: string): Fund[] => {
