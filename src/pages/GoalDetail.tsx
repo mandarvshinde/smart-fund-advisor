@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Goal } from '@/types';
-import { getGoalById } from '@/services/mockData';
 import { ChevronLeft, PenSquare, Trash2, Plus, ChevronRight, Share2, TrendingUp } from 'lucide-react';
 
 const GoalDetail = () => {
@@ -16,13 +15,25 @@ const GoalDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Simulating a goal for demonstration purposes
     // In a real app, we would fetch the goal from an API
     if (id) {
       setLoading(true);
       // Simulate API call
       setTimeout(() => {
-        const fetchedGoal = getGoalById(id);
-        setGoal(fetchedGoal || null);
+        const demoGoal = {
+          id: id,
+          name: "Sample Goal",
+          targetAmount: 1000000,
+          targetDate: "2028-04-01",
+          currentAmount: 250000,
+          monthlyContribution: 10000,
+          progress: 25,
+          investments: ["SBI Bluechip Fund", "Axis Long Term Equity Fund"],
+          riskAppetite: "moderate" as "low" | "moderate" | "high",
+          expectedReturn: 12
+        };
+        setGoal(demoGoal);
         setLoading(false);
       }, 500);
     }
