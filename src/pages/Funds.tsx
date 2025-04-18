@@ -8,7 +8,8 @@ import { FundFilters } from "@/components/funds/FundFilters";
 import { LoadingSkeleton } from "@/components/funds/LoadingSkeleton";
 import { fetchFundsList } from "@/services/fundService";
 import { Fund } from "@/types";
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Funds = () => {
   const [category, setCategory] = useState<string>('all');
@@ -24,10 +25,10 @@ const Funds = () => {
     queryFn: () => fetchFundsList(category, sortBy, fundHouse),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
-    retry: 1,
+    retry: 2,
     meta: {
       onError: () => {
-        toast.error("Failed to load funds. Please try again later.", {
+        toast.error("Failed to load funds data from AMFI and MFAPI. Please try again later.", {
           duration: 5000,
         });
       }
@@ -46,6 +47,11 @@ const Funds = () => {
     setFundHouse(newFundHouse);
   };
 
+  const handleRefetch = () => {
+    toast.info("Refreshing funds data...");
+    refetch();
+  };
+
   return (
     <PageLayout 
       title="Explore Mutual Funds" 
@@ -60,6 +66,18 @@ const Funds = () => {
           activeFundHouse={fundHouse}
           onFundHouseChange={handleFundHouseChange}
         />
+        <div className="mt-4 flex justify-end">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefetch} 
+            disabled={isLoading || isFetching}
+            className="text-teal-700 border-teal-200 hover:bg-teal-50"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
       </div>
 
       {isLoading || isFetching ? (
@@ -70,7 +88,7 @@ const Funds = () => {
               <div>
                 <h3 className="font-medium text-amber-800">Loading funds</h3>
                 <p className="text-sm text-amber-700">
-                  We're fetching the latest mutual fund data. This usually takes just a moment...
+                  We're fetching the latest mutual fund data from AMFI and MFAPI. This may take a moment...
                 </p>
               </div>
             </div>
@@ -85,24 +103,30 @@ const Funds = () => {
         <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
           <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
           <h3 className="text-lg font-medium text-red-800 mb-1">Error loading funds</h3>
-          <p className="text-red-600 mb-4">We couldn't load the mutual fund data. Please try again later.</p>
-          <button 
+          <p className="text-red-600 mb-4">We couldn't fetch mutual fund data from AMFI and MFAPI. Please try again later.</p>
+          <Button 
             onClick={() => refetch()}
             className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-md hover:from-teal-700 hover:to-cyan-700 transition-colors"
           >
             Retry
-          </button>
+          </Button>
         </div>
-      ) : funds?.length === 0 ? (
+      ) : !funds || funds.length === 0 ? (
         <div className="text-center py-10 bg-teal-50 rounded-lg border border-teal-200">
           <h3 className="text-lg font-medium text-teal-800 mb-1">No funds found</h3>
           <p className="text-teal-600 mb-4">
-            We couldn't find any mutual funds matching your criteria. Try changing your filters.
+            We couldn't find any mutual funds matching your criteria. Try changing your filters or refreshing the data.
           </p>
+          <Button 
+            onClick={handleRefetch}
+            className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-md hover:from-teal-700 hover:to-cyan-700 transition-colors"
+          >
+            Refresh Data
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {funds?.map((fund: Fund) => (
+          {funds.map((fund: Fund) => (
             <FundCard key={fund.schemeCode} fund={fund} />
           ))}
         </div>
