@@ -12,16 +12,29 @@ export interface Fund {
     threeYear?: number;
     fiveYear?: number;
   };
+  riskLevel?: string;
 }
 
 // --- FundDetails Type ---
 export interface FundDetails extends Fund {
-  riskLevel?: string;
   launchDate?: string;
   schemeType?: string;
+  expenseRatio?: string;
+  aum?: string;
+  exitLoad?: string;
+  fundManager?: string;
+  benchmark?: string;
   navHistory?: Array<{
     date: string;
     nav: number;
+  }>;
+  holdings?: Array<{
+    name: string;
+    percentage: number;
+  }>;
+  sectorAllocation?: Array<{
+    sector: string;
+    percentage: number;
   }>;
 }
 

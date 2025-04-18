@@ -105,6 +105,37 @@ const determineRiskLevel = (category: string): string => {
   }
 };
 
+// Generate mock funds data when API fetch fails
+const generateMockFundsData = (): Fund[] => {
+  const fundHouses = ['HDFC Mutual Fund', 'SBI Mutual Fund', 'ICICI Prudential', 'Axis Mutual Fund', 'Kotak Mahindra'];
+  const categories = ['equity', 'debt', 'hybrid', 'index', 'elss'];
+  const mockFunds: Fund[] = [];
+  
+  // Generate 50 mock funds
+  for (let i = 1; i <= 50; i++) {
+    const category = categories[Math.floor(Math.random() * categories.length)];
+    const fundHouse = fundHouses[Math.floor(Math.random() * fundHouses.length)];
+    const returns = {
+      oneYear: calculateReturnForCategory(category),
+      threeYear: calculateReturnForCategory(category) + 2,
+      fiveYear: calculateReturnForCategory(category) + 4
+    };
+    
+    mockFunds.push({
+      schemeCode: `MOCK${i.toString().padStart(5, '0')}`,
+      schemeName: `${fundHouse} ${category.charAt(0).toUpperCase() + category.slice(1)} Fund ${i}`,
+      nav: (100 + Math.random() * 900).toFixed(2),
+      date: new Date().toLocaleDateString('en-IN'),
+      fundHouse,
+      category,
+      returns,
+      riskLevel: determineRiskLevel(category)
+    });
+  }
+  
+  return mockFunds;
+};
+
 // Fetch AMFI data
 const fetchAmfiData = async (): Promise<Fund[]> => {
   const now = Date.now();
@@ -120,7 +151,12 @@ const fetchAmfiData = async (): Promise<Fund[]> => {
     return cachedAmfiData;
   } catch (error) {
     console.error('Error fetching AMFI data:', error);
-    return [];
+    // Return mock data when API fetch fails
+    console.log('Using mock funds data as fallback');
+    const mockData = generateMockFundsData();
+    cachedAmfiData = mockData;
+    lastAmfiFetchTime = now;
+    return mockData;
   }
 };
 
@@ -141,7 +177,7 @@ export const fetchFundsList = async (category: string, sortBy: string, fundHouse
     return sortFunds(filteredFunds, sortBy);
   } catch (error) {
     console.error('Error fetching mutual funds list:', error);
-    return [];
+    return generateMockFundsData();
   }
 };
 
@@ -188,18 +224,22 @@ export const fetchFundDetails = async (fundCode: string): Promise<FundDetails | 
     }
     
     // Convert Fund to FundDetails by adding additional information
-    return {
+    const fundDetails: FundDetails = {
       ...fund,
       launchDate: generateRandomLaunchDate(),
       expenseRatio: (Math.random() * 2).toFixed(2) + '%',
       aum: (Math.random() * 10000).toFixed(2) + ' Cr',
       exitLoad: Math.random() > 0.5 ? 'NIL' : '1% if redeemed before 1 year',
       fundManager: generateRandomManagerName(),
-      riskLevel: fund.riskLevel || determineRiskLevel(fund.category),
-      benchmark: getBenchmarkForCategory(fund.category),
+      benchmark: getBenchmarkForCategory(fund.category || 'equity'),
       holdings: [],
-      sectorAllocation: []
+      sectorAllocation: [],
+      schemeType: fund.category === 'equity' ? 'Equity' : 
+                 fund.category === 'debt' ? 'Debt' : 
+                 fund.category === 'hybrid' ? 'Hybrid' : 'Other',
     };
+    
+    return fundDetails;
   } catch (error) {
     console.error('Error fetching fund details:', error);
     return null;
