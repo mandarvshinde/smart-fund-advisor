@@ -1,6 +1,14 @@
 
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Youtube, Linkedin, MessageSquare, MessagesSquare, Discord, Reddit } from "lucide-react";
+import { 
+  Facebook, 
+  Instagram, 
+  Twitter, 
+  Youtube, 
+  Linkedin, 
+  Share2 as Reddit, 
+  MessageSquare as Discord 
+} from "lucide-react";
 
 interface LogoProps {
   className?: string;
