@@ -5,27 +5,55 @@ import { calculateReturns } from '../utils/returnCalculator';
 
 const MFAPI_BASE_URL = 'https://api.mfapi.in/mf/';
 
+// Add local caching for returns data
+const returnsCache = new Map<string, Fund>();
+
 export const fetchFundReturns = async (fund: Fund): Promise<Fund> => {
   try {
-    const response = await axios.get(`${MFAPI_BASE_URL}${fund.schemeCode}`);
-    if (response.data && response.data.data) {
-      const navHistory = response.data.data;
-      if (navHistory.length > 0) {
-        const returns = calculateReturns(navHistory);
-        return { ...fund, returns };
-      }
+    // Check cache first
+    if (returnsCache.has(fund.schemeCode)) {
+      return returnsCache.get(fund.schemeCode) as Fund;
     }
-    return fund;
+
+    const response = await axios.get(`${MFAPI_BASE_URL}${fund.schemeCode}`, {
+      timeout: 10000 // 10 seconds timeout
+    });
+    
+    if (!response.data || !response.data.data || !Array.isArray(response.data.data) || response.data.data.length === 0) {
+      console.warn(`No NAV history for fund ${fund.schemeCode}`);
+      return fund;
+    }
+    
+    const navHistory = response.data.data;
+    const returns = calculateReturns(navHistory);
+    const fundWithReturns = { ...fund, returns };
+    
+    // Cache the result
+    returnsCache.set(fund.schemeCode, fundWithReturns);
+    
+    return fundWithReturns;
   } catch (error) {
     console.error(`Error fetching returns data for fund ${fund.schemeCode}:`, error);
     return fund;
   }
 };
 
+// Cache for fund details
+const detailsCache = new Map<string, FundDetails | null>();
+
 export const fetchFundDetails = async (fundCode: string): Promise<FundDetails | null> => {
   try {
-    const response = await axios.get(`${MFAPI_BASE_URL}${fundCode}`);
+    // Check cache first
+    if (detailsCache.has(fundCode)) {
+      return detailsCache.get(fundCode);
+    }
+
+    const response = await axios.get(`${MFAPI_BASE_URL}${fundCode}`, {
+      timeout: 15000 // 15 seconds timeout
+    });
+    
     if (!response.data || !response.data.meta) {
+      console.warn(`No details for fund ${fundCode}`);
       return null;
     }
     
@@ -37,9 +65,9 @@ export const fetchFundDetails = async (fundCode: string): Promise<FundDetails | 
     
     const returns = calculateReturns(mfapiData.data);
     
-    return {
+    const fundDetails: FundDetails = {
       schemeCode: fundCode,
-      schemeName: mfapiData.meta.scheme_name,
+      schemeName: mfapiData.meta.scheme_name || 'Unknown Fund',
       nav: mfapiData.data[0]?.nav || '0',
       date: mfapiData.data[0]?.date || '',
       returns,
@@ -54,9 +82,15 @@ export const fetchFundDetails = async (fundCode: string): Promise<FundDetails | 
       holdings: [],
       sectorAllocation: []
     };
+    
+    // Cache the result
+    detailsCache.set(fundCode, fundDetails);
+    
+    return fundDetails;
   } catch (error) {
     console.error('Error fetching fund details:', error);
+    // Cache the null result to prevent repeated failures
+    detailsCache.set(fundCode, null);
     return null;
   }
 };
-

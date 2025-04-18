@@ -8,8 +8,9 @@ import { FundFilters } from "@/components/funds/FundFilters";
 import { LoadingSkeleton } from "@/components/funds/LoadingSkeleton";
 import { fetchFundsList } from "@/services/fundService";
 import { Fund } from "@/types";
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const Funds = () => {
   const [category, setCategory] = useState<string>('all');
@@ -25,10 +26,10 @@ const Funds = () => {
     queryFn: () => fetchFundsList(category, sortBy, fundHouse),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
-    retry: 2,
+    retry: 3,
     meta: {
       onError: () => {
-        toast.error("Failed to load funds data from AMFI and MFAPI. Please try again later.", {
+        toast.error("Failed to load funds data. Please try refreshing.", {
           duration: 5000,
         });
       }
@@ -82,17 +83,13 @@ const Funds = () => {
 
       {isLoading || isFetching ? (
         <div>
-          <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
-            <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-500" />
-              <div>
-                <h3 className="font-medium text-amber-800">Loading funds</h3>
-                <p className="text-sm text-amber-700">
-                  We're fetching the latest mutual fund data from AMFI and MFAPI. This may take a moment...
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert className="bg-amber-50 border border-amber-200 mb-6">
+            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <AlertTitle className="text-amber-800">Loading funds</AlertTitle>
+            <AlertDescription className="text-amber-700">
+              We're fetching the latest mutual fund data from AMFI and MFAPI. This may take a moment...
+            </AlertDescription>
+          </Alert>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
               <LoadingSkeleton key={index} />
@@ -113,16 +110,30 @@ const Funds = () => {
         </div>
       ) : !funds || funds.length === 0 ? (
         <div className="text-center py-10 bg-teal-50 rounded-lg border border-teal-200">
+          <AlertTriangle className="h-10 w-10 text-amber-500 mx-auto mb-2" />
           <h3 className="text-lg font-medium text-teal-800 mb-1">No funds found</h3>
           <p className="text-teal-600 mb-4">
             We couldn't find any mutual funds matching your criteria. Try changing your filters or refreshing the data.
           </p>
-          <Button 
-            onClick={handleRefetch}
-            className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-md hover:from-teal-700 hover:to-cyan-700 transition-colors"
-          >
-            Refresh Data
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={handleRefetch}
+              className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-md hover:from-teal-700 hover:to-cyan-700 transition-colors"
+            >
+              Refresh Data
+            </Button>
+            <Button 
+              onClick={() => {
+                setCategory('all');
+                setFundHouse('all');
+                setSortBy('returns');
+              }}
+              variant="outline"
+              className="px-4 py-2 text-teal-700 border-teal-300"
+            >
+              Reset Filters
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
