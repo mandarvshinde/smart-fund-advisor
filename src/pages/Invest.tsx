@@ -45,7 +45,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { fetchFundDetails } from '@/services/fundService';
 
 const Invest = () => {
   const [searchParams] = useSearchParams();

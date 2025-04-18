@@ -3,8 +3,17 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+
+// Mock or actual implementation of fetchFundDetails
+const fetchFundDetails = async (fundId: string): Promise<FundDetails> => {
+  // Replace this with the actual API call
+  const response = await fetch(`/api/funds/${fundId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch fund details');
+  }
+  return response.json();
+};
 import PageLayout from "@/components/layout/PageLayout";
-import { fetchFundDetails } from "@/services/fundService";
 import { FundDetails } from "@/types";
 import { AlertCircle, BarChart3, Building, TrendingUp, Award, FileText, Scale, ShieldCheck, Calendar, DollarSign, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
