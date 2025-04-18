@@ -85,3 +85,13 @@ export type ChatMessage = {
 
 // Re-export Fund types from fundTypes.ts to maintain compatibility
 export type { Fund, FundDetails } from './fundTypes';
+
+export type LocalFund = {
+  schemeCode: string;
+  schemeName: string;
+  nav: string;
+  date: string;
+  fundHouse: string;
+  category: string;
+  riskLevel: string;
+};
