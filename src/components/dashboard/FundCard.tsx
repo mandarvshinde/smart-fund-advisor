@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Fund } from "@/types";
+import { MessageSquare } from "lucide-react";
 
 interface FundCardProps {
   fund: Fund;
@@ -30,8 +31,9 @@ export const FundCard = ({ fund }: FundCardProps) => {
             <p className="text-sm font-semibold">₹{parseFloat(fund.nav).toFixed(2)}</p>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`/invest?fund=${fund.schemeCode}`}>
-              Invest
+            <Link to="/advisor">
+              <MessageSquare className="h-4 w-4 mr-1" />
+              Chat
             </Link>
           </Button>
         </div>
