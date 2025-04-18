@@ -19,7 +19,8 @@ export const fetchFundsList = async (category: string, sortBy: string, fundHouse
     
     // Process a reasonable number of funds for better performance
     // You can increase this number for production use
-    const fundsToProcess = funds.slice(0, 100); 
+    const maxFundsToProcess = Math.min(funds.length, 50);
+    const fundsToProcess = funds.slice(0, maxFundsToProcess); 
     console.log(`Processing ${fundsToProcess.length} funds for returns data`);
 
     // Add returns data from MFAPI for each fund
@@ -37,7 +38,10 @@ export const fetchFundsList = async (category: string, sortBy: string, fundHouse
     // Apply filters
     let filteredFunds = validFunds;
     if (category && category !== 'all') {
-      filteredFunds = filteredFunds.filter(fund => fund.category === category.toLowerCase());
+      filteredFunds = filteredFunds.filter(fund => 
+        fund.category === category.toLowerCase() || 
+        (fund.category?.includes(category.toLowerCase()))
+      );
       console.log(`Filtered by category '${category}': ${filteredFunds.length} funds remaining`);
     }
 
